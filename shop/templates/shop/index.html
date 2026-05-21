@@ -1,0 +1,110 @@
+{% extends 'shop/layouts/main.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<!-- Hero Section -->
+<section class="hero-section d-flex align-items-center text-center text-white"
+         style="position: relative; height: 90vh; overflow: hidden;">
+  
+  <!-- Background Video -->
+  <video autoplay muted loop playsinline 
+         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+    <source src="https://cdn.coverr.co/videos/coverr-shopping-in-style-1234/1080p.mp4" type="video/mp4">
+  </video>
+
+  <!-- Overlay -->
+<!-- Overlay -->
+<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(153, 0, 0, 0.7);"></div>
+
+<!-- Content -->
+<div class="container position-relative" style="z-index: 2; color: #D4AF37;">
+  <h1 class="display-3 fw-bold animate__animated animate__fadeInDown" style="color: #D4AF37;">
+    Elevate Your Shopping Experience
+  </h1>
+  <p class="lead mt-3 mb-4 animate__animated animate__fadeInUp animate__delay-1s" style="color: #FFD700;">
+    Explore premium collections and exclusive offers — all in one place.
+  </p>
+  <a href="{% url 'collections' %}" 
+     class="btn btn-lg px-4 py-2 me-2 animate__animated animate__fadeInUp animate__delay-2s"
+     style="background-color: #D4AF37; color: #8B0000; border: none;">
+    Shop Now
+  </a>
+  <a href="{% url 'fav' %}" 
+     class="btn btn-lg px-4 py-2 animate__animated animate__fadeInUp animate__delay-2s"
+     style="border: 2px solid #D4AF37; color: #D4AF37;">
+    View Favourites
+  </a>
+</div>
+
+</section>
+
+<!-- Animation Library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+
+
+
+<!-- Animation Library -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+
+
+<!-- Slider -->
+{% include 'shop/inc/slider.html' %}
+
+<!-- ===== Hot Deals (revamped) ===== -->
+<div class="product-section">
+  <div class="container">
+    <!-- catchy header -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-column flex-md-row">
+      <h2 class="section-title"><span class="spark">🔥</span> Today's Hot Picks — Grab Them Before They're Gone</h2>
+      <div class="text-end mt-3 mt-md-0">
+        <a href="{% url 'collections' %}" class="btn btn-sm btn-primary cta-pill">Shop All Deals</a>
+      </div>
+    </div>
+
+    <!-- optional small promo row -->
+    <div class="promo-row mb-4 d-flex gap-2 flex-wrap">
+      <div class="promo-pill">Flash Sale • Up to <strong>50% OFF</strong></div>
+      <div class="promo-pill">Free Shipping Over ₹999</div>
+      <div class="promo-pill">New Arrivals • Curated Picks</div>
+    </div>
+
+    <!-- product grid -->
+    <div class="row g-3">
+      {% for item in products %}
+      <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="card product-card position-relative h-100">
+        
+
+          {% if item.product_image %}
+            <img src="{{ item.product_image.url }}" class="card-img-top product-img" alt="{{ item.name }}">
+          {% else %}
+            <img src="{% static 'images/default.jpg' %}" class="card-img-top product-img" alt="No image available">
+          {% endif %}
+
+          <div class="card-body text-center">
+            <h5 class="card-title">{{ item.name }}</h5>
+            <p class="card-text mb-2">
+              <span class="old-price">Rs.{{ item.original_price|stringformat:'d' }}</span>
+              <span class="new-price ms-2">Rs.{{ item.selling_price|stringformat:'d' }}</span>
+            </p>
+
+            <div class="d-flex justify-content-center gap-2">
+              <a href="{% url 'product_details' item.category.name item.name %}" class="btn btn-sm btn-outline-theme">View</a>
+              <a href="#" class="btn btn-sm btn-theme">Grab It</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<!-- ===== End Hot Deals ===== -->
+
+
+
+{% endblock content %}

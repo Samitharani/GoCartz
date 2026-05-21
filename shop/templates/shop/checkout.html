@@ -1,0 +1,129 @@
+ {% extends 'shop/layouts/main.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    .checkout-container {
+        background: #fff7ef;
+        padding: 25px;
+        border-radius: 10px;
+    }
+    .checkout-title {
+        color: #7A0A0A;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    .form-control {
+        border-radius: 8px;
+        padding: 10px;
+        border: 1px solid #d5d5d5;
+    }
+    .summary-card {
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 20px;
+    }
+    .summary-item {
+        border-bottom: 1px solid #eee;
+        padding: 15px 0;
+    }
+    .summary-item:last-child {
+        border-bottom: none;
+    }
+    .pay-btn {
+        width: 100%;
+        background: #D4A017;
+        color: #fff;
+        padding: 15px;
+        font-size: 18px;
+        border-radius: 10px;
+        border: none;
+        margin-top: 15px;
+    }
+    .pay-btn:hover {
+        background: #b58913;
+    }
+</style>
+
+<section class="py-4" style="background:#f9efea;">
+    <div class="container">
+        <div class="row">
+
+            <!-- LEFT SIDE: BILLING DETAILS -->
+            <div class="col-md-7">
+                <div class="checkout-container shadow-sm">
+                    <h4 class="checkout-title">Billing & Delivery Details</h4>
+
+                    <form id="checkout-form">
+                        <label class="mt-2">Full Name *</label>
+                        <input type="text" class="form-control" placeholder="Enter your full name" required>
+
+                        <label class="mt-3">Mobile Number *</label>
+                        <input type="text" class="form-control" placeholder="Enter your mobile number" required>
+
+                        <label class="mt-3">Address Line 1 *</label>
+                        <input type="text" class="form-control" placeholder="House no., Building name" required>
+
+                        <label class="mt-3">Address Line 2 (Optional)</label>
+                        <input type="text" class="form-control" placeholder="Road name, Area, Colony">
+
+                        <label class="mt-3">City *</label>
+                        <input type="text" class="form-control" placeholder="Enter your city" required>
+
+                        <label class="mt-3">State *</label>
+                        <input type="text" class="form-control" placeholder="Enter your state" required>
+
+                        <label class="mt-3">Pincode *</label>
+                        <input type="number" class="form-control" placeholder="Enter 6-digit pincode" required>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RIGHT SIDE: ORDER SUMMARY -->
+            <div class="col-md-5">
+                <div class="summary-card shadow-sm">
+
+                    <h5 class="checkout-title">Order Summary</h5>
+
+                    {% for item in cart_items %}
+                    <div class="summary-item d-flex">
+                        <img src="{{ item.product.product_image.url }}" width="70" height="70" style="border-radius:10px; object-fit:cover;">
+                        <div class="ms-3">
+                            <p class="mb-1" style="font-weight:600;">{{ item.product.name }}</p>
+                            <p class="mb-1">₹{{ item.product.selling_price|stringformat:'d' }}</p>
+                        </div>
+                        <div class="ms-auto">Qty: {{ item.product_qty }}</div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="pt-3">
+                        <div class="d-flex justify-content-between">
+                            <span>Subtotal</span>
+                            <span>₹{{ total_amount }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between text-success mt-2">
+                            <span>Delivery Charge</span>
+                            <span>Free</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold" style="color:#7A0A0A;">
+                            <span>Grand Total</span>
+                            <span>₹{{ total_amount }}</span>
+                        </div>
+
+                        <!-- PAY NOW BUTTON -->
+                        <button class="pay-btn">Pay Now</button>
+
+                        <p class="text-center mt-2" style="color:#b12d2d; font-size:12px;">
+                            <i class="fa fa-lock"></i> Secure Payment Powered by Razorpay
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

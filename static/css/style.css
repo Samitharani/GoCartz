@@ -1,0 +1,393 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+html{
+    font: size 14px
+}
+
+body{
+    font-family:'Noto Sans',sans-serif;
+}
+a{
+    text-decoration:none;
+}
+
+.pic-box {
+    padding: 10px;
+    border: 1px solid #ccc;
+    position: relative;
+}
+
+.hot {
+  background-color: orangered;
+  color: white;
+  width: 50px;
+  text-align: center;
+  font-weight: bold;
+  padding: 5px 10px;
+  font-size: 14px;
+  display: inline-block;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+}
+.old_price {
+  color: gray; /* or black if you want */
+  font-size: 14px;
+}
+
+.new_price {
+  color: black !important;  /* This overrides Bootstrap’s blue */
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Hover effect for product cards */
+.product-card:hover {
+  transform: scale(1.02);
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 8px 16px rgba(194, 16, 16, 0.15);
+}
+
+/* Optional: Hover color for Shop Now button */
+.btn-outline-primary:hover {
+  background-color: #007bff;
+  color: white;
+}
+.navbar-custom {
+    background-color: #7B1113;
+    margin-bottom: 0 !important; /* Royal Crimson */
+}
+.navbar-custom .navbar-brand,
+.navbar-custom span,
+.navbar-custom .nav-link {
+    color: #D4AF37 !important; /* Antique Gold */
+}
+.navbar-custom .nav-link:hover {
+    color: #fff3c6 !important; /* Lighter gold on hover */
+}
+/* Remove gap between navbar and hero section */
+
+
+
+.hero-section {
+    background-color: #3E2723; /* Royal Brown */
+    color: #D4AF37; /* Antique Gold text */
+    padding: 10px 0 !important; /* Smaller padding */
+    text-align: center;
+    min-height: unset !important; /* Remove any locked height */
+    height: auto !important;
+    border-top: 5px solid #D4AF37; 
+    margin-top: 0 !important;
+    padding-top: 0 !important; /* Let content decide height */
+}
+
+
+
+.hero-section h1 {
+    font-size: 1.4rem; /* Much smaller heading */
+    font-weight: bold;
+    margin: 2px 0; /* Minimal top/bottom spacing */
+}
+
+.hero-section p {
+    font-size: 0.75rem; /* Smaller paragraph */
+    margin: 2px 0;
+}
+
+.hero-section .btn {
+    padding: 4px 8px; /* Smaller buttons */
+    font-size: 0.75rem;
+}
+
+
+.hero-section .btn-primary {
+    background-color: #D4AF37;
+    border-color: #D4AF37;
+    color: #7B1113;
+}
+
+.hero-section .btn-primary:hover {
+    background-color: #b8962f; /* Darker gold on hover */
+    border-color: #b8962f;
+    color: white;
+}
+
+.hero-section .btn-outline-light {
+    border-color: #D4AF37;
+    color: #D4AF37;
+}
+
+.hero-section .btn-outline-light:hover {
+    background-color: #D4AF37;
+    color: #7B1113;
+}
+
+/* ========== Product area styling (theme-matched) ========== */
+/* Using your theme colors:
+   dark red: #7B1113
+   banner overlay red: rgba(153,0,0,0.7) (you used)
+   gold: #D4AF37
+*/
+
+.product-section {
+  background: linear-gradient(180deg, rgba(123,17,19,0.06) 0%, rgba(62,39,35,0.04) 100%);
+  padding: 40px 0 60px;
+}
+
+/* header/title */
+.section-title {
+  font-family: 'Noto Sans', sans-serif;
+  color: #7B1113; /* anchor title in dark red for contrast */
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+}
+.spark { margin-right: 6px; }
+
+/* promo pills below title */
+.promo-row { gap: 12px; }
+.promo-pill {
+  background: rgba(212,175,55,0.12);
+  color: #D4AF37;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  border: 1px solid rgba(212,175,55,0.12);
+}
+
+/* CTA pill */
+.cta-pill {
+  background-color: #D4AF37;
+  color: #7B1113;
+  border: none;
+  border-radius: 28px;
+  padding: 6px 14px;
+  font-weight: 600;
+}
+.cta-pill:hover { background-color: #b8962f; color: #fff; }
+
+/* Card appearance */
+.product-card {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.28s cubic-bezier(.2,.9,.2,1), box-shadow 0.28s;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+/* image zone */
+.product-img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+/* image hover zoom */
+.product-card:hover .product-img {
+  transform: scale(1.06);
+}
+
+/* card hover lift */
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.12);
+}
+
+/* titles & prices */
+.card-title { 
+  font-size: 1rem;
+  color: #333;
+  font-weight: 600;
+  min-height: 46px; /* keeps product titles aligned */
+}
+.old-price {
+  color: #8a8a8a;
+  text-decoration: line-through;
+  font-size: 0.9rem;
+}
+.new-price {
+  color: #D4AF37;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+/* buttons */
+.btn-outline-theme {
+  color: #7B1113;
+  border: 1px solid #7B1113;
+  background: transparent;
+  border-radius: 6px;
+}
+.btn-outline-theme:hover {
+  background: #7B1113;
+  color: #fff;
+}
+
+.btn-theme {
+  background: linear-gradient(90deg,#D4AF37,#f0c84b);
+  color: #7B1113;
+  border: none;
+  border-radius: 6px;
+}
+.btn-theme:hover { opacity: 0.95; transform: translateY(-1px); }
+
+/* discount badge */
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #D4AF37;
+  color: #7B1113;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* responsive tweaks */
+@media (max-width: 767px) {
+  .product-img { height: 200px; }
+  .section-title { text-align: center; font-size: 1.25rem; }
+  .promo-row { justify-content: center; }
+}
+.custom-footer {
+    background-color: #7B1113; /* Deep brown */
+    color: #f1c40f; /* Gold text */
+    font-family: Arial, sans-serif;
+}
+
+.custom-footer a {
+    color: #f1c40f;
+    text-decoration: none;
+}
+
+.custom-footer a:hover {
+    color: #FFD700;
+    text-decoration: underline;
+}
+
+.custom-footer h6 {
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #FFD700;
+}
+
+.social-section {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.social-icons a {
+    font-size: 18px;
+    margin: 0 10px;
+    color: #FFD700;
+    transition: color 0.3s;
+}
+
+.social-icons a:hover {
+    color: white;
+}
+
+.footer-links {
+    padding: 30px 0;
+}
+
+.footer-column p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding: 15px;
+    background-color: #3d0707; /* darker brown */
+    color: #FFD700;
+    font-size: 14px;
+}
+.custom-footer {
+    border-top: 4px solid #FFD700; /* Gold line for contrast */
+}
+.custom-footer {
+    background-color: #7B1E1E; /* Rich maroon */
+    color: #FFD700; /* Gold */
+    font-family: Arial, sans-serif;
+}
+
+.custom-footer a {
+    color: #FFD700;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.custom-footer a:hover {
+    color: white;
+    transform: translateX(3px);
+}
+
+.custom-footer h6 {
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #FFD700;
+    font-size: 16px;
+}
+
+.social-section {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.social-icons a {
+    font-size: 18px;
+    margin: 0 8px;
+    color: #FFD700;
+    background: rgba(255,255,255,0.1);
+    padding: 6px 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+    background: #FFD700;
+    color: #7B1E1E;
+}
+
+.footer-links {
+    padding: 30px 0;
+}
+
+.footer-column p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding: 15px;
+    background-color: #5C1414; /* darker maroon */
+    color: #FFD700;
+    font-size: 14px;
+}
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    margin-bottom: 0;
+}
+
+.login-section {
+    margin-top: 0;
+    padding-top: 0;
+}

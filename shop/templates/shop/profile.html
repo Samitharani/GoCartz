@@ -1,0 +1,31 @@
+{% extends 'shop/layouts/main.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4 text-center">
+            <img src="{{ profile.profile_picture.url }}" class="rounded-circle" width="150" height="150">
+            <h4 class="mt-2">{{ profile.user.username }}</h4>
+            <p>{{ profile.user.email }}</p>
+            <p>📞 {{ profile.phone }}</p>
+            <p>Gender: {{ profile.get_gender_display }}</p>
+            <p>DOB: {{ profile.dob }}</p>
+            <a href="{% url 'edit_profile' %}" class="btn btn-warning btn-sm">Edit Profile</a>
+        </div>
+        <div class="col-md-8">
+            <h5>Saved Addresses</h5>
+            {% if addresses %}
+                {% for address in addresses %}
+                    <div class="card p-3 mb-2">
+                        <strong>{{ address.full_name }}</strong> ({{ address.phone }})<br>
+                        {{ address.address_line }}, {{ address.city }}, {{ address.state }} - {{ address.pincode }}<br>
+                        {% if address.landmark %} Landmark: {{ address.landmark }} {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No addresses found.</p>
+            {% endif %}
+            <a href="{% url 'add_address' %}" class="btn btn-primary btn-sm">Add Address</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
