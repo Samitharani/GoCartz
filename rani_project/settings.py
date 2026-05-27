@@ -65,20 +65,32 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rani_project.wsgi.application'
 
+USE_SQLITE = os.environ.get('USE_SQLITE', '0') == '1'
+DB_ENGINE = os.environ.get('DB_ENGINE', 'django.db.backends.mysql')
+DB_NAME = os.environ.get('DB_NAME', 'django_rani')
+DB_USER = os.environ.get('DB_USER', 'root')
+DB_PASSWORD = os.environ.get('DB_PASSWORD', '123456789')
+DB_HOST = os.environ.get('DB_HOST', 'localhost')
+DB_PORT = os.environ.get('DB_PORT', '3306')
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'django_rani',
-        'HOST': 'localhost',
-        'USER': 'root',
-        'PASSWORD': '123456789', 
-        'PORT': '3306'
+if USE_SQLITE or DB_ENGINE == 'django.db.backends.sqlite3' or not os.environ.get('DB_HOST'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
-
-
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': DB_ENGINE,
+            'NAME': DB_NAME,
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
+            'HOST': DB_HOST,
+            'PORT': DB_PORT,
+        }
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [
