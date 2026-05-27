@@ -1,0 +1,195 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block admin_content %}
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+
+:root {
+  --brand-dark: #7B1C1C;
+  --brand-gold: #C8972A;
+  --font-head:  'Sora', sans-serif;
+  --font-body:  'DM Sans', sans-serif;
+  --card-radius: 14px;
+}
+
+body { font-family: var(--font-body); background: #F5F0EB; }
+
+.cat-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.cat-topbar h1 {
+  font-family: var(--font-head);
+  font-size: 24px; font-weight: 700;
+  color: #1a1a1a; margin: 0;
+}
+
+.btn-add-cat {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--brand-gold); color: #fff;
+  border: none; border-radius: 30px;
+  padding: 10px 22px;
+  font-family: var(--font-head); font-size: 13.5px; font-weight: 700;
+  cursor: pointer; text-decoration: none;
+  transition: background .15s, transform .15s;
+}
+.btn-add-cat:hover { background: #b8841f; color: #fff; transform: translateY(-1px); }
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.cat-card {
+  background: #fff;
+  border-radius: var(--card-radius);
+  padding: 24px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.07);
+  transition: box-shadow .2s, transform .2s;
+  display: flex; flex-direction: column; gap: 10px;
+  position: relative;
+}
+.cat-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.1); transform: translateY(-2px); }
+
+.cat-emoji {
+  font-size: 44px; line-height: 1;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.cat-name {
+  font-family: var(--font-head);
+  font-size: 18px; font-weight: 700;
+  color: #1a1a1a; margin: 0;
+}
+.cat-count {
+  font-size: 13px; color: #888; margin: 0;
+}
+
+.cat-tags {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-top: 4px;
+}
+.cat-tag {
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 11.5px; font-weight: 500;
+  padding: 3px 10px; border-radius: 20px;
+}
+
+.cat-actions {
+  display: flex; gap: 10px;
+  margin-top: auto; padding-top: 14px;
+  border-top: 1px solid #f0f0f0;
+}
+.cat-btn {
+  width: 36px; height: 36px;
+  border-radius: 8px; border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; cursor: pointer;
+  transition: background .15s;
+  background: none;
+  text-decoration: none;
+}
+.cat-btn-edit  { color: var(--brand-dark); }
+.cat-btn-edit:hover  { background: #fdf0e0; }
+.cat-btn-delete { color: #dc2626; }
+.cat-btn-delete:hover { background: #fee2e2; }
+
+.cat-empty {
+  grid-column: 1 / -1;
+  text-align: center; padding: 60px 20px;
+  background: #fff; border-radius: var(--card-radius);
+  color: #aaa;
+}
+.cat-empty span { font-size: 48px; display: block; margin-bottom: 12px; }
+.cat-empty h5 { font-family: var(--font-head); font-size: 16px; color: #555; margin-bottom: 6px; }
+
+@media (max-width: 1100px) { .cat-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px)  { .cat-grid { grid-template-columns: 1fr; } }
+</style>
+
+<div class="cat-topbar">
+  <h1>Categories</h1>
+  <a href="#add-category-form" class="btn-add-cat">+ Add Category</a>
+</div>
+
+<div class="section-card" id="add-category-form" style="margin-bottom:24px;">
+  <div class="section-header">
+    <h2>Add New Category</h2>
+  </div>
+  <div class="section-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group" style="grid-column: span 2;">
+          <label for="id_name">Category Name</label>
+          {{ form.name }}
+        </div>
+        <div class="form-group">
+          <label for="id_image">Category Image</label>
+          {{ form.image }}
+        </div>
+        <div class="form-group" style="grid-column: span 2;">
+          <label for="id_description">Description</label>
+          {{ form.description }}
+        </div>
+        <div class="form-group">
+          <label for="id_status">Visibility</label>
+          {{ form.status }}
+        </div>
+      </div>
+      <button type="submit" class="btn-primary" style="margin-top:16px;">Save Category</button>
+    </form>
+  </div>
+</div>
+
+<!-- Category Grid -->
+<div class="cat-grid">
+  {% if categories %}
+    {% for category in categories %}
+    <div class="cat-card">
+
+      <span class="cat-emoji">{{ category.icon|default:"" }}</span>
+
+      <h3 class="cat-name">{{ category.name }}</h3>
+      <p class="cat-count">{{ category.product_count|default:0 }} products</p>
+
+      {% if category.subcategories.all %}
+      <div class="cat-tags">
+        {% for sub in category.subcategories.all|slice:":4" %}
+          <span class="cat-tag">{{ sub.name }}</span>
+        {% endfor %}
+        {% if category.subcategories.count > 4 %}
+          <span class="cat-tag">+{{ category.subcategories.count|add:"-4" }} more</span>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <div class="cat-actions">
+        <a href="#" class="cat-btn cat-btn-edit" title="Edit">✏️</a>
+        <a href="#"
+           class="cat-btn cat-btn-delete"
+           title="Delete"
+           onclick="return confirm('Delete {{ category.name }}?')">🗑️</a>
+      </div>
+
+    </div>
+    {% endfor %}
+
+  {% else %}
+    <div class="cat-empty">
+      <span></span>
+      <h5>No categories yet</h5>
+      <p>Click <strong>+ Add Category</strong> to create your first one.</p>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}

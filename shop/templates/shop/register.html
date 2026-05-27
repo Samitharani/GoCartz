@@ -1,57 +1,485 @@
-{% extends 'shop/layouts/main.html' %}
-{% block title %}
-  Registration | GoCartz
-{% endblock %}
+﻿{% extends 'shop/layouts/main.html' %}
+{% load static %}
+
 {% block content %}
- <div class="container" style="margin-top:70px;min-height:600px;">
-  <div class="row">
-    <div class="col-12">
-      <h4 class="mb-3">New User Registration</h4>
-      <hr style ="border-color:#b8bfc2;">
-         {% include 'shop/inc/message.html' %}
-  
-    </div>
-  </div>
-  <section class="py-4 my-5">
-    <div class="container">
-      <div class="row">
-        <div class="col-6">
-          <form method="post" action="">
-            {% csrf_token %}
-            <div class="mb-4">
-              <label for="" class="form-label">User Name</label>
-              {{form.username}}
-              {% if form.errors.username %}
-              <label class="text-danger">{{form.errors.username}}</label>
-              {% endif %}
-            </div>
-            <div class="mb-4">
-              <label for="" class="form-label">User Email</label>
-              {{form.email}}
-              {% if form.error.email %}
-              <label class="text-danger">{{form.errors.email}}</label>
-              {% endif %}
-            </div>
-            <div class="mb-4">
-              <label for="" class="form-label">Password</label>
-              {{form.password1}}
-              {% if form.errors.password1 %}
-              <label class="text-danger">{{form.errors.password1}}</label>
-              {% endif %}
-            </div>
-            <div class="mb-4">
-              <label for="" class="form-label">Confirm Password</label>
-              {{form.password2}}
-              {% if form.errors.password2 %}
-              <label class="text-danger">{{form.errors.password2}}</label>
-              {% endif %}
-            </div>
-            <button type="submit" class="btn btn-primary">Register</button>
-          </form>
-          <p class="my-2">Already user ? <a href="{% url 'login' %}">Login Now</a> </p>
+
+<style>
+/* ===== HIDE NORMAL NAVBAR ON REGISTER ===== */
+nav { display: none !important; }
+body { margin: 0; padding: 0; }
+
+/* ===== FULL PAGE ===== */
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: url('https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1600&q=80') center/cover no-repeat fixed;
+  position: relative;
+}
+.register-page::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(90, 14, 14, 0.72);
+  z-index: 0;
+}
+
+/* ===== CENTER ===== */
+.register-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  position: relative;
+  z-index: 10;
+}
+
+/* ===== CARD ===== */
+.register-card {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  overflow: hidden;
+  border-top: 4px solid #D4AF37;
+}
+.register-card-body {
+  padding: 32px 40px 36px;
+}
+
+/* ===== BACK LINK ===== */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #888;
+  text-decoration: none;
+  margin-bottom: 20px;
+  transition: color 0.15s;
+}
+.back-link:hover { color: #7B1C1C; }
+
+/* ===== BRAND ===== */
+.reg-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.reg-brand-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: #7B1C1C;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 16px rgba(123,28,28,0.3);
+}
+.reg-brand-icon svg { width: 26px; height: 26px; fill: #D4AF37; }
+.reg-brand h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; color: #7B1C1C;
+  font-weight: 600; margin: 0 0 4px;
+  text-align: center;
+}
+.reg-brand p {
+  font-size: 12px; color: #999;
+  margin: 0; text-align: center;
+}
+
+/* ===== ROLE TABS ===== */
+.reg-role-tabs {
+  display: flex; gap: 0;
+  background: #f5f0e8;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+.reg-role-tab {
+  flex: 1; text-align: center;
+  padding: 9px 8px; border-radius: 8px;
+  font-size: 13px; font-weight: 500;
+  color: #888; cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.reg-role-tab:hover { color: #7B1C1C; }
+.reg-role-tab.active {
+  background: #7B1C1C;
+  color: #D4AF37;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(123,28,28,0.25);
+}
+
+/* ===== FIELD LABEL ===== */
+.field-label {
+  font-size: 11px; font-weight: 700;
+  color: #aaa; letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* ===== INPUTS ===== */
+.auth-input,
+.auth-input.form-control,
+select.auth-input {
+  width: 100% !important;
+  padding: 11px 14px !important;
+  background: #fdf6e8 !important;
+  border: 1.5px solid #f0e6c8 !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  color: #333 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  transition: border-color 0.2s, box-shadow 0.2s !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+.auth-input:focus,
+.auth-input.form-control:focus {
+  border-color: #7B1C1C !important;
+  box-shadow: 0 0 0 3px rgba(123,28,28,0.08) !important;
+}
+.auth-input::placeholder { color: #bbb; }
+
+/* Password wrapper */
+.pwd-wrap { position: relative; }
+.pwd-wrap .eye-btn {
+  position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none;
+  cursor: pointer; color: #bbb; font-size: 14px; padding: 0;
+}
+.pwd-wrap .eye-btn:hover { color: #7B1C1C; }
+
+/* ===== 2 COLUMN GRID ===== */
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ===== INFO BOX ===== */
+.info-box {
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12px; color: #856404;
+  margin-bottom: 16px;
+  display: flex; gap: 8px; align-items: flex-start;
+}
+.info-box i { margin-top: 1px; flex-shrink: 0; }
+
+/* ===== TERMS ===== */
+.terms-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 18px; font-size: 12px; color: #666;
+}
+.terms-row input[type="checkbox"] {
+  width: 16px; height: 16px;
+  accent-color: #7B1C1C; cursor: pointer; flex-shrink: 0;
+}
+.terms-row a { color: #7B1C1C; font-weight: 500; }
+.terms-row a:hover { text-decoration: underline; }
+
+/* ===== SUBMIT BUTTON ===== */
+.btn-register {
+  width: 100%; padding: 13px;
+  background: #D4AF37; color: #7B1C1C;
+  border: none; border-radius: 10px;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  margin-bottom: 16px;
+}
+.btn-register:hover {
+  background: #c9a42e;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(212,175,55,0.3);
+}
+
+/* ===== SIGN IN ROW ===== */
+.signin-row {
+  text-align: center;
+  font-size: 13px; color: #666;
+}
+.signin-row a {
+  color: #7B1C1C; font-weight: 700; text-decoration: none;
+}
+.signin-row a:hover { text-decoration: underline; }
+
+/* ===== FOOTER STRIP ===== */
+.reg-footer-strip {
+  position: relative; z-index: 10;
+  text-align: center;
+  padding: 14px;
+  font-size: 12px;
+  color: rgba(212,175,55,0.6);
+  background: rgba(60,8,8,0.4);
+}
+
+/* ===== SELLER SECTION ===== */
+.seller-section { margin-top: 4px; }
+</style>
+
+<div class="register-page">
+
+  <!-- Center Card -->
+  <div class="register-center">
+    <div class="register-card">
+      <div class="register-card-body">
+
+        <!-- Back Link -->
+        <a href="{% url 'login' %}?role={{ selected_role|default:'buyer' }}" class="back-link">
+          ← Back to Login
+        </a>
+
+        <!-- Brand Icon -->
+        <div class="reg-brand">
+          <div class="reg-brand-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/>
+            </svg>
+          </div>
+          <h2>
+            {% if selected_role == 'seller' %}Become a Vendor{% else %}Create Buyer Account{% endif %}
+          </h2>
+          <p>
+            {% if selected_role == 'seller' %}
+              Set up your shop and reach local customers.
+            {% else %}
+              Join thousands of smart shoppers on GoCartz.
+            {% endif %}
+          </p>
         </div>
+
+        {% include 'shop/inc/message.html' %}
+
+        <!-- Role Tabs -->
+        <div class="reg-role-tabs">
+          <a href="{% url 'register' %}?role=buyer"
+             class="reg-role-tab {% if selected_role == 'buyer' or not selected_role %}active{% endif %}">
+            🛒 Buyer
+          </a>
+          <a href="{% url 'register' %}?role=seller"
+             class="reg-role-tab {% if selected_role == 'seller' %}active{% endif %}">
+            🏪 Seller
+          </a>
+        </div>
+
+        <!-- FORM -->
+        <form method="post" action="">
+          {% csrf_token %}
+          <input type="hidden" name="role" value="{{ selected_role|default:'buyer' }}">
+
+          <!-- ===== BUYER FORM ===== -->
+          {% if selected_role != 'seller' %}
+
+          <div class="mb-3">
+            <label class="field-label">USERNAME</label>
+            {{ form.username }}
+            {% for error in form.username.errors %}
+              <div style="color:#c0392b;font-size:12px;margin-top:4px;">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="mb-3">
+            <label class="field-label">EMAIL ADDRESS</label>
+            {{ form.email }}
+            {% for error in form.email.errors %}
+              <div style="color:#c0392b;font-size:12px;margin-top:4px;">{{ error }}</div>
+            {% endfor %}
+          </div>
+
+          <div class="form-row-2 mb-3">
+            <div>
+              <label class="field-label">PHONE NUMBER</label>
+              <input type="tel" name="phone" class="auth-input"
+                     placeholder="+91 98765 43210">
+            </div>
+            <div>
+              <label class="field-label">CITY</label>
+              <input type="text" name="city" class="auth-input"
+                     placeholder="e.g. Mumbai, Chennai...">
+            </div>
+          </div>
+
+          <div class="form-row-2 mb-3">
+            <div>
+              <label class="field-label">PASSWORD</label>
+              <div class="pwd-wrap">
+                {{ form.password1 }}
+                <button type="button" class="eye-btn" onclick="togglePwd('id_password1','eye1')">
+                  <i class="fa fa-eye" id="eye1"></i>
+                </button>
+              </div>
+              {% for error in form.password1.errors %}
+                <div style="color:#c0392b;font-size:12px;margin-top:4px;">{{ error }}</div>
+              {% endfor %}
+            </div>
+            <div>
+              <label class="field-label">CONFIRM PASSWORD</label>
+              <div class="pwd-wrap">
+                {{ form.password2 }}
+                <button type="button" class="eye-btn" onclick="togglePwd('id_password2','eye2')">
+                  <i class="fa fa-eye" id="eye2"></i>
+                </button>
+              </div>
+              {% for error in form.password2.errors %}
+                <div style="color:#c0392b;font-size:12px;margin-top:4px;">{{ error }}</div>
+              {% endfor %}
+            </div>
+          </div>
+
+          {% endif %}
+
+          <!-- ===== SELLER FORM ===== -->
+          {% if selected_role == 'seller' %}
+
+          <div class="seller-section">
+            <div class="mb-3">
+              <label class="field-label">USERNAME</label>
+              {{ form.username }}
+              {% for error in form.username.errors %}
+                <div style="color:#c0392b;font-size:12px;margin-top:4px;">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="form-row-2 mb-3">
+              <div>
+                <label class="field-label">EMAIL ADDRESS</label>
+                {{ form.email }}
+              </div>
+              <div>
+                <label class="field-label">PHONE NUMBER</label>
+                <input type="tel" name="phone" class="auth-input" placeholder="+91 98765 43210">
+              </div>
+            </div>
+
+            <div class="form-row-2 mb-3">
+              <div>
+                <label class="field-label">SHOP NAME</label>
+                <input type="text" name="shop_name" class="auth-input"
+                       placeholder="e.g. Meera's Boutique">
+              </div>
+              <div>
+                <label class="field-label">BUSINESS CATEGORY</label>
+                <input type="text" name="business_category" class="auth-input"
+                       placeholder="e.g. Fashion & Apparel">
+              </div>
+            </div>
+
+            <div class="form-row-2 mb-3">
+              <div>
+                <label class="field-label">CITY</label>
+                <input type="text" name="city" class="auth-input"
+                       placeholder="e.g. Chennai">
+              </div>
+              <div>
+                <label class="field-label">GST NUMBER <span style="color:#bbb;font-weight:400;">(optional)</span></label>
+                <input type="text" name="gst_number" class="auth-input" placeholder="Optional">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="field-label">SHORT DESCRIPTION</label>
+              <textarea name="description" class="auth-input" rows="2"
+                        placeholder="Tell customers what makes your shop special..."></textarea>
+            </div>
+
+            <div class="form-row-2 mb-3">
+              <div>
+                <label class="field-label">PASSWORD</label>
+                <div class="pwd-wrap">
+                  {{ form.password1 }}
+                  <button type="button" class="eye-btn" onclick="togglePwd('id_password1','seye1')">
+                    <i class="fa fa-eye" id="seye1"></i>
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label class="field-label">CONFIRM PASSWORD</label>
+                <div class="pwd-wrap">
+                  {{ form.password2 }}
+                  <button type="button" class="eye-btn" onclick="togglePwd('id_password2','seye2')">
+                    <i class="fa fa-eye" id="seye2"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-box">
+              <i class="fa fa-check-circle"></i>
+              <span><strong>Your account is ready.</strong> Once your details are submitted, you can log in immediately.</span>
+            </div>
+          </div>
+
+          {% endif %}
+
+          <!-- Terms -->
+          <div class="terms-row">
+            <input type="checkbox" id="terms" required>
+            <label for="terms">
+              I agree to GoCartz's
+              <a href="#">Terms of Service</a> and
+              <a href="#">Privacy Policy</a>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-register">
+            {% if selected_role == 'seller' %}Submit for Approval{% else %}Create My Account{% endif %}
+          </button>
+        </form>
+
+        <div class="signin-row">
+          Already have an account?
+          <a href="{% url 'login' %}?role={{ selected_role|default:'buyer' }}">Sign In</a>
+        </div>
+
       </div>
     </div>
-  </section>
- </div>
- {% endblock content %}
+  </div>
+
+  <!-- Footer Strip -->
+  <div class="reg-footer-strip">
+    © 2026 GoCartz. Hyperlocal commerce, reimagined.
+  </div>
+
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script>
+function togglePwd(inputId, iconId) {
+  const input = document.getElementById(inputId);
+  const icon  = document.getElementById(iconId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.className = 'fa fa-eye-slash';
+  } else {
+    input.type = 'password';
+    icon.className = 'fa fa-eye';
+  }
+}
+
+// Apply auth-input class to Django form fields
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('input[name="username"], input[name="email"], input[name="password1"], input[name="password2"]')
+    .forEach(function(el) {
+      el.classList.add('auth-input');
+      if (!el.getAttribute('placeholder')) {
+        const name = el.getAttribute('name');
+        if (name === 'username') el.setAttribute('placeholder', 'Enter username');
+        if (name === 'email')    el.setAttribute('placeholder', 'priya@example.com');
+        if (name === 'password1') el.setAttribute('placeholder', 'Min. 8 characters');
+        if (name === 'password2') el.setAttribute('placeholder', 'Re-enter password');
+      }
+    });
+});
+</script>
+{% endblock scripts %}

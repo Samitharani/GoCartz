@@ -55,27 +55,31 @@
                 <div class="checkout-container shadow-sm">
                     <h4 class="checkout-title">Billing & Delivery Details</h4>
 
-                    <form id="checkout-form">
-                        <label class="mt-2">Full Name *</label>
-                        <input type="text" class="form-control" placeholder="Enter your full name" required>
+                    <form method="post" id="checkout-form">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Select delivery address</label>
+                            {% if addresses %}
+                                {% for address in addresses %}
+                                    <div class="form-check mb-2 p-3" style="border:1px solid #e3e3e3; border-radius:10px;">
+                                        <input class="form-check-input" type="radio" name="selected_address" id="address{{ address.id }}" value="{{ address.id }}" {% if forloop.first %}checked{% endif %}>
+                                        <label class="form-check-label ms-2" for="address{{ address.id }}">
+                                            <strong>{{ address.full_name }}</strong> | {{ address.phone }}<br>
+                                            {{ address.address_line }}, {{ address.city }}, {{ address.state }} - {{ address.pincode }}
+                                            {% if address.landmark %}<br>Landmark: {{ address.landmark }}{% endif %}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-danger">No saved address found. <a href="{% url 'add_address' %}">Add an address</a> to proceed.</p>
+                            {% endif %}
+                        </div>
 
-                        <label class="mt-3">Mobile Number *</label>
-                        <input type="text" class="form-control" placeholder="Enter your mobile number" required>
+                        <div class="mt-3">
+                            <a href="{% url 'add_address' %}" class="btn btn-outline-primary btn-sm">Add new address</a>
+                        </div>
 
-                        <label class="mt-3">Address Line 1 *</label>
-                        <input type="text" class="form-control" placeholder="House no., Building name" required>
-
-                        <label class="mt-3">Address Line 2 (Optional)</label>
-                        <input type="text" class="form-control" placeholder="Road name, Area, Colony">
-
-                        <label class="mt-3">City *</label>
-                        <input type="text" class="form-control" placeholder="Enter your city" required>
-
-                        <label class="mt-3">State *</label>
-                        <input type="text" class="form-control" placeholder="Enter your state" required>
-
-                        <label class="mt-3">Pincode *</label>
-                        <input type="number" class="form-control" placeholder="Enter 6-digit pincode" required>
+                        <button type="submit" class="pay-btn mt-4" {% if not addresses %}disabled{% endif %}>Place Order</button>
                     </form>
                 </div>
             </div>
@@ -113,7 +117,7 @@
                         </div>
 
                         <!-- PAY NOW BUTTON -->
-                        <button class="pay-btn">Pay Now</button>
+                        <button type="submit" form="checkout-form" class="pay-btn">Pay Now</button>
 
                         <p class="text-center mt-2" style="color:#b12d2d; font-size:12px;">
                             <i class="fa fa-lock"></i> Secure Payment Powered by Razorpay

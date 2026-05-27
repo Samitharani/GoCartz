@@ -45,23 +45,19 @@
             <!-- Total Row -->
             <tr>
               <td colspan="4" class="text-end"><b>Total Amount</b></td>
-              <td colspan="2" id="net" class="fw-bold">Rs: 0</td>
+              <td colspan="2" id="net" class="fw-bold">Rs: {{ total_amount|stringformat:'d' }}</td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      {% if cart_items %}
+      <div class="col-12 text-end mt-3">
+        <a href="{% url 'checkout' %}" class="btn btn-success btn-lg">Proceed to Checkout</a>
+      </div>
+      {% endif %}
     </div>
   </div>
 </section>
-
-<!-- JS for Calculating Total -->
-<script>
-  const nodes = document.querySelectorAll('.amt');
-  const arr = Array.from(nodes);
-  const total = arr.reduce((acc, curr) => {
-    return acc + Number(curr.textContent);
-  }, 0);
-  document.getElementById("net").innerHTML = "Rs: " + total;
-</script>
 
 {% endblock content %}

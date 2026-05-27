@@ -1,0 +1,266 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block admin_content %}
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+
+:root {
+  --brand-dark: #7B1C1C;
+  --brand-mid:  #9B2C2C;
+  --brand-gold: #C8972A;
+  --font-head:  'Sora', sans-serif;
+  --font-body:  'DM Sans', sans-serif;
+  --card-radius: 14px;
+}
+
+body { font-family: var(--font-body); }
+
+.dash-greeting { margin-bottom: 28px; }
+.dash-greeting h1 {
+  font-family: var(--font-head);
+  font-size: 26px; font-weight: 700;
+  color: #1a1a1a; margin-bottom: 4px;
+}
+.dash-greeting p { color: #666; font-size: 14px; margin: 0; }
+
+.metric-grid-6 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.metric-card-new {
+  background: #fff;
+  border-radius: var(--card-radius);
+  padding: 20px 22px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.07);
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  transition: box-shadow .2s, transform .2s;
+}
+.metric-card-new:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,.1);
+  transform: translateY(-2px);
+}
+.metric-icon-sq {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex; align-items: center;
+  justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.ic-green  { background: #d1fae5; }
+.ic-blue   { background: #dbeafe; }
+.ic-purple { background: #ede9fe; }
+.ic-amber  { background: #fef3c7; }
+.ic-orange { background: #ffedd5; }
+.ic-red    { background: #fee2e2; }
+.metric-info { flex: 1; }
+.metric-info .mlabel {
+  font-size: 11px; font-weight: 600;
+  color: #9ca3af; letter-spacing: .6px;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.metric-info .mvalue {
+  font-family: var(--font-head);
+  font-size: 26px; font-weight: 700;
+  color: #111; line-height: 1.1; margin-bottom: 4px;
+}
+.metric-info .msub { font-size: 12px; }
+.msub .up   { color: #16a34a; font-weight: 600; }
+.msub .warn { color: #d97706; font-weight: 600; }
+.msub .down { color: #dc2626; font-weight: 600; }
+.msub .gray { color: #6b7280; }
+
+.section-card-new {
+  background: #fff;
+  border-radius: var(--card-radius);
+  box-shadow: 0 1px 6px rgba(0,0,0,.07);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.section-card-header {
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.section-card-header h5 {
+  font-family: var(--font-head);
+  font-size: 16px; font-weight: 700;
+  color: #1a1a1a; margin: 0;
+}
+.section-card-header a {
+  font-size: 12.5px; color: var(--brand-dark);
+  font-weight: 600; text-decoration: none;
+}
+.section-card-header a:hover { text-decoration: underline; }
+
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table thead tr { background: var(--brand-dark); }
+.admin-table thead th {
+  padding: 12px 18px;
+  font-size: 12px; font-weight: 600;
+  color: var(--brand-gold);
+  letter-spacing: .5px; text-transform: uppercase;
+  white-space: nowrap;
+}
+.admin-table tbody tr {
+  border-bottom: 1px solid #f5f5f5;
+  transition: background .12s;
+}
+.admin-table tbody tr:hover { background: #fdf8f2; }
+.admin-table tbody td {
+  padding: 13px 18px;
+  font-size: 13.5px; color: #333;
+  vertical-align: middle;
+}
+.vendor-name { font-weight: 600; color: #1a1a1a; }
+
+.pill {
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 12px; font-weight: 600;
+  display: inline-block;
+}
+.pill-active  { background: #dcfce7; color: #166534; }
+.pill-pending { background: #fef9c3; color: #854d0e; }
+.pill-reject  { background: #fee2e2; color: #991b1b; }
+
+.btn-view {
+  background: none;
+  border: 1.5px solid var(--brand-dark);
+  color: var(--brand-dark);
+  border-radius: 8px;
+  padding: 5px 14px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: var(--font-body);
+  transition: all .15s;
+}
+.btn-view:hover {
+  background: var(--brand-dark); color: #fff;
+}
+
+@media (max-width: 1100px) {
+  .metric-grid-6 { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 640px) {
+  .metric-grid-6 { grid-template-columns: 1fr; }
+}
+</style>
+
+<div class="dash-greeting">
+  <h1>Good morning, Admin 👋</h1>
+  <p>Here's your platform overview.</p>
+</div>
+
+<div class="metric-grid-6">
+
+  <div class="metric-card-new">
+    <div class="metric-icon-sq ic-green">💲</div>
+    <div class="metric-info">
+      <div class="mlabel">Total Sales</div>
+      <div class="mvalue">₹{{ total_sales|default:"0" }}</div>
+      <div class="msub"><span class="up">+18% this month</span></div>
+    </div>
+  </div>
+
+  <div class="metric-card-new">
+    <div class="metric-icon-sq ic-blue">👥</div>
+    <div class="metric-info">
+      <div class="mlabel">Active Vendors</div>
+      <div class="mvalue">{{ active_vendors|default:"0" }}</div>
+      <div class="msub"><span class="up">+3 this week</span></div>
+    </div>
+  </div>
+
+  <div class="metric-card-new">
+    <div class="metric-icon-sq ic-purple">📦</div>
+    <div class="metric-info">
+      <div class="mlabel">Total Orders</div>
+      <div class="mvalue">{{ total_orders|default:"0" }}</div>
+      <div class="msub"><span class="up">+12 today</span></div>
+    </div>
+  </div>
+
+  <div class="metric-card-new">
+    <div class="metric-icon-sq ic-amber">📈</div>
+    <div class="metric-info">
+      <div class="mlabel">Commission Earned</div>
+      <div class="mvalue">₹{{ commission_earned|default:"0" }}</div>
+      <div class="msub"><span class="gray">10% of sales</span></div>
+    </div>
+  </div>
+
+  <div class="metric-card-new">
+    <div class="metric-icon-sq ic-orange">🕐</div>
+    <div class="metric-info">
+      <div class="mlabel">Pending Approvals</div>
+      <div class="mvalue">{{ pending_approvals|default:"0" }}</div>
+      <div class="msub"><span class="warn">action needed</span></div>
+    </div>
+  </div>
+
+  <div class="metric-card-new">
+    <div class="metric-icon-sq ic-red">🔄</div>
+    <div class="metric-info">
+      <div class="mlabel">Refund Requests</div>
+      <div class="mvalue">{{ refund_requests|default:"0" }}</div>
+      <div class="msub"><span class="down">pending review</span></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="section-card-new">
+  <div class="section-card-header">
+    <h5>Top Vendors</h5>
+    <a href="{% url 'admin_vendor_approvals' %}">Review approvals →</a>
+  </div>
+  <div class="table-responsive">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Vendor</th>
+          <th>Category</th>
+          <th>City</th>
+          <th>Total Sales</th>
+          <th>Orders</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for vendor in top_vendors %}
+        <tr>
+          <td><span class="vendor-name">{{ vendor.vendor_name }}</span></td>
+          <td>{{ vendor.business_category }}</td>
+          <td>{{ vendor.vendor_city }}</td>
+          <td>₹{{ vendor.total_sales|default:"0" }}</td>
+          <td>{{ vendor.orders|default:"0" }}</td>
+          <td>
+            {% if vendor.is_vendor_approved %}
+              <span class="pill pill-active">Active</span>
+            {% else %}
+              <span class="pill pill-pending">Pending</span>
+            {% endif %}
+          </td>
+          <td>
+            <button class="btn-view">View</button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" style="padding:32px;text-align:center;color:#aaa;">
+            No vendor data available yet.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

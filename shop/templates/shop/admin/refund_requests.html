@@ -1,0 +1,45 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block admin_content %}
+<div class="topbar">
+  <h1>Refund Requests</h1>
+  <p>Review cancelled orders for refund follow-up.</p>
+</div>
+
+<div class="section-card">
+  <div class="section-header">
+    <h2>Cancelled Orders</h2>
+    <a href="#">Filter requests</a>
+  </div>
+  <div class="section-body">
+    {% if refund_requests %}
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Amount</th>
+              <th>Requested</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in refund_requests %}
+            <tr>
+              <td>#{{ order.id }}</td>
+              <td>{{ order.user.username }}</td>
+              <td>₹{{ order.total_price }}</td>
+              <td>{{ order.updated_at|date:"M d, Y" }}</td>
+              <td><span class="pill-pending">{{ order.status }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p style="color:#6b7280; padding:24px 0;">No refund requests at this time.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

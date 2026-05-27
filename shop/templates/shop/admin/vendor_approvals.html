@@ -1,0 +1,50 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block admin_content %}
+<div class="topbar">
+  <h1>Vendor Approvals</h1>
+  <p>Review new vendor applications and approve trusted sellers.</p>
+</div>
+
+<div class="section-card">
+  <div class="section-header">
+    <h2>Pending Vendor Requests</h2>
+    <a href="{% url 'admin_dashboard' %}">Back to dashboard →</a>
+  </div>
+  <div class="section-body">
+    {% if seller_requests %}
+      <div class="grid-2">
+        {% for seller in seller_requests %}
+        <div class="summary-card">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px;">
+            <h3>{{ seller.vendor_name|default:seller.user.username }}</h3>
+            {% if seller.vendor_request_status == 'approved' %}
+              <span class="status-pill pill-active">Approved</span>
+            {% elif seller.vendor_request_status == 'rejected' %}
+              <span class="status-pill pill-rejected">Rejected</span>
+            {% else %}
+              <span class="status-pill pill-pending">Pending</span>
+            {% endif %}
+          </div>
+          <p style="font-size:14px; margin-top:0; color:#555;">{{ seller.business_category }} • {{ seller.vendor_city }}</p>
+          <p style="margin:12px 0 0; color:#444; font-size:13px;">{{ seller.description|truncatechars:120 }}</p>
+          <p style="margin:14px 0 0; font-size:13px; color:#777;">GST: {{ seller.gst_number|default:'N/A' }} • {{ seller.user.email }}</p>
+          <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap;">
+            <form method="post" action="{% url 'admin_vendor_action' seller.id %}">
+              {% csrf_token %}
+              <button type="submit" name="action" value="approve" class="btn-primary">Approve</button>
+            </form>
+            <form method="post" action="{% url 'admin_vendor_action' seller.id %}">
+              {% csrf_token %}
+              <button type="submit" name="action" value="reject" class="btn-secondary">Reject</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="color:#6b7280; padding:24px 0;">No vendor approvals are pending right now.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

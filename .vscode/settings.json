@@ -1,4 +1,11 @@
 {
     "liveServer.settings.port": 5501,
-    "python-envs.defaultEnvManager": "ms-python.python:pipenv"
+    "python-envs.defaultEnvManager": "ms-python.python:pipenv",
+    "python-envs.pythonProjects": [
+        {
+            "path": ".",
+            "envManager": "ms-python.python:pipenv",
+            "packageManager": "ms-python.python:pip"
+        }
+    ]
 }

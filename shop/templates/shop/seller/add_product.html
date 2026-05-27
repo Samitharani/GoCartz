@@ -1,0 +1,643 @@
+{% extends 'shop/layouts/main.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+
+  :root {
+    --brand-dark:  #7B1C1C;
+    --brand-mid:   #9B2C2C;
+    --brand-gold:  #C8972A;
+    --brand-light: #FDF6EE;
+    --sidebar-w:   220px;
+    --card-radius: 14px;
+    --font-head:   'Sora', sans-serif;
+    --font-body:   'DM Sans', sans-serif;
+  }
+
+  body { font-family: var(--font-body); background: #F5F0EB; }
+
+  /* ── Shell ── */
+  .dash-shell { display: flex; min-height: 100vh; }
+
+  /* ════ SIDEBAR ════ */
+  .dash-sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: var(--brand-dark);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 200;
+    box-shadow: 4px 0 20px rgba(0,0,0,.18);
+  }
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 18px 18px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+    text-decoration: none;
+  }
+  .sidebar-logo-icon {
+    width: 38px; height: 38px;
+    background: var(--brand-gold);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .sidebar-logo-text {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .sidebar-logo-text span {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    color: rgba(255,255,255,.6);
+    font-family: var(--font-body);
+  }
+  .sidebar-vendor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 18px;
+    border-bottom: 1px solid rgba(255,255,255,.1);
+  }
+  .sidebar-vendor-avatar {
+    width: 36px; height: 36px;
+    background: var(--brand-gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .sidebar-vendor-name { font-size: 13px; font-weight: 600; color: #fff; line-height: 1.3; }
+  .sidebar-vendor-sub  { font-size: 11px; color: rgba(255,255,255,.55); }
+  .vendor-status {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: #4ade80;
+    border-radius: 50%;
+    margin-right: 4px;
+  }
+  .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+  .sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 9px;
+    color: rgba(255,255,255,.72);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: background .15s, color .15s;
+    margin-bottom: 2px;
+  }
+  .sidebar-nav a:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .sidebar-nav a.active {
+    background: rgba(255,255,255,.18);
+    color: #fff;
+    font-weight: 600;
+    border-left: 3px solid var(--brand-gold);
+    padding-left: 9px;
+  }
+  .sidebar-nav a .nav-icon { width: 18px; text-align: center; font-size: 14px; }
+  .sidebar-nav .badge-pill {
+    margin-left: auto;
+    background: #ef4444;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 20px;
+  }
+  .sidebar-footer {
+    padding: 12px 18px;
+    border-top: 1px solid rgba(255,255,255,.1);
+    font-size: 12px;
+    color: #4ade80;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sidebar-footer.pending { color: #fbbf24; }
+
+  /* ════ TOP HEADER ════ */
+  .dash-topbar {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-w);
+    right: 0;
+    height: 58px;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    z-index: 100;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .topbar-title {
+    font-family: var(--font-head);
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .topbar-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 13px;
+    color: #999;
+    cursor: pointer;
+  }
+  .topbar-avatar {
+    width: 34px; height: 34px;
+    background: var(--brand-gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 13px;
+    color: #fff;
+  }
+  .topbar-bell {
+    font-size: 17px;
+    color: #666;
+    cursor: pointer;
+    position: relative;
+  }
+
+  /* ════ MAIN ════ */
+  .dash-main {
+    margin-left: var(--sidebar-w);
+    margin-top: 58px;
+    flex: 1;
+    padding: 32px 36px;
+    box-sizing: border-box;
+  }
+
+  /* ── Centered form card ── */
+  .add-product-wrap {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .form-card {
+    background: #fff;
+    border-radius: var(--card-radius);
+    box-shadow: 0 2px 12px rgba(0,0,0,.07);
+    overflow: hidden;
+  }
+  .form-card-header {
+    padding: 24px 28px 0;
+  }
+  .form-card-header h2 {
+    font-family: var(--font-head);
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+  }
+  .form-card-header p { font-size: 13px; color: #888; margin-bottom: 24px; }
+
+  .form-card-body { padding: 0 28px 28px; }
+
+  /* Fields */
+  .field-group { margin-bottom: 18px; }
+  .field-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 6px;
+  }
+  .field-group input[type="text"],
+  .field-group input[type="number"],
+  .field-group select,
+  .field-group textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #e8e0d8;
+    border-radius: 9px;
+    background: var(--brand-light);
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    box-sizing: border-box;
+  }
+  .field-group input:focus,
+  .field-group select:focus,
+  .field-group textarea:focus {
+    border-color: var(--brand-dark);
+    box-shadow: 0 0 0 3px rgba(123,28,28,.08);
+  }
+  .field-group textarea { resize: vertical; min-height: 90px; }
+  .field-group select { appearance: none; cursor: pointer; }
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    pointer-events: none;
+    font-size: 13px;
+  }
+
+  /* Two column */
+  .field-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+  /* Image upload */
+  .upload-area {
+    border: 2px dashed #d4b896;
+    border-radius: 10px;
+    background: #fffaf5;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    position: relative;
+  }
+  .upload-area:hover { border-color: var(--brand-gold); background: #fff8ee; }
+  .upload-area input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+  .upload-icon { font-size: 28px; margin-bottom: 8px; }
+  .upload-area p { font-size: 13px; color: #888; margin: 0; }
+  .upload-area p strong { color: #555; }
+
+  /* Divider */
+  .form-divider {
+    height: 1px;
+    background: #f0ebe4;
+    margin: 20px 0;
+  }
+
+  /* Toggles */
+  .toggle-row {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .toggle-item { display: flex; align-items: center; gap: 10px; }
+  .toggle-item label { font-size: 14px; color: #444; font-weight: 500; cursor: pointer; }
+
+  /* iOS-style toggle */
+  .toggle-switch { position: relative; display: inline-block; width: 42px; height: 24px; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: #ddd;
+    border-radius: 24px;
+    transition: background .25s;
+    cursor: pointer;
+  }
+  .toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    left: 3px; top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform .25s;
+    box-shadow: 0 1px 4px rgba(0,0,0,.2);
+  }
+  .toggle-switch input:checked + .toggle-slider { background: var(--brand-dark); }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
+  .toggle-switch input:checked + .toggle-slider.gold-toggle { background: var(--brand-gold); }
+
+  /* Smart price tip */
+  .smart-tip {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 22px;
+  }
+  .smart-tip-icon { font-size: 17px; flex-shrink: 0; }
+  .smart-tip-title { font-size: 13px; font-weight: 700; color: #92400e; margin-bottom: 2px; }
+  .smart-tip-text  { font-size: 12.5px; color: #b45309; }
+  .smart-tip-text strong { color: var(--brand-dark); }
+
+  /* Buttons */
+  .btn-publish {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    background: var(--brand-gold);
+    color: var(--brand-dark);
+    border: none;
+    border-radius: 9px;
+    font-family: var(--font-head);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity .15s, transform .15s;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .btn-publish:hover { opacity: .9; transform: translateY(-1px); }
+  .btn-draft {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    color: var(--brand-dark);
+    border: 1.5px solid var(--brand-dark);
+    border-radius: 9px;
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s;
+    text-align: center;
+  }
+  .btn-draft:hover { background: rgba(123,28,28,.05); }
+
+  @media (max-width: 768px) {
+    .dash-sidebar { transform: translateX(-100%); }
+    .dash-main { margin-left: 0; padding: 20px 16px; margin-top: 58px; }
+    .dash-topbar { left: 0; }
+    .field-row-2, .field-row-3 { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="dash-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="dash-sidebar">
+    <a href="{% url 'home' %}" class="sidebar-logo">
+      <div class="sidebar-logo-icon">GC</div>
+      <div class="sidebar-logo-text">
+        GoCartz
+        <span>Seller Portal</span>
+      </div>
+    </a>
+    <div class="sidebar-vendor">
+      <div class="sidebar-vendor-avatar">
+        {{ request.user.username|slice:":2"|upper }}
+      </div>
+      <div>
+        <div class="sidebar-vendor-name">{{ profile.vendor_name }}</div>
+        <div class="sidebar-vendor-sub">
+          <span class="vendor-status"></span>{{ profile.vendor_city }}
+        </div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="{% url 'seller_dashboard' %}">
+        <span class="nav-icon"><i class="fa fa-th-large"></i></span> Dashboard
+      </a>
+      <a href="{% url 'seller_products' %}">
+        <span class="nav-icon"><i class="fa fa-box"></i></span> My Products
+      </a>
+      <a href="{% url 'seller_add_product' %}" class="active">
+        <span class="nav-icon"><i class="fa fa-plus"></i></span> Add Product
+      </a>
+      <a href="{% url 'seller_orders' %}">
+        <span class="nav-icon"><i class="fa fa-shopping-basket"></i></span> Orders
+        {% if pending_orders > 0 %}
+          <span class="badge-pill">{{ pending_orders }}</span>
+        {% endif %}
+      </a>
+      <a href="{% url 'seller_earnings' %}">
+        <span class="nav-icon"><i class="fa fa-coins"></i></span> Earnings
+      </a>
+      <a href="{% url 'seller_low_stock' %}">
+        <span class="nav-icon"><i class="fa fa-exclamation-triangle"></i></span> Low Stock
+        {% if low_stock_count > 0 %}
+          <span class="badge-pill">{{ low_stock_count }}</span>
+        {% endif %}
+      </a>
+      <a href="{% url 'logout' %}" style="color:#fca5a5;">
+        <span class="nav-icon"><i class="fa fa-power-off"></i></span> Logout
+      </a>
+    </nav>
+    <div class="sidebar-footer {% if not profile.is_vendor_approved %}pending{% endif %}">
+      <i class="fa {% if profile.is_vendor_approved %}fa-check-circle{% else %}fa-clock{% endif %}"></i>
+      {% if profile.is_vendor_approved %}Approved Vendor{% else %}Pending Approval{% endif %}
+    </div>
+  </aside>
+
+  <!-- TOP BAR -->
+  <div class="dash-topbar">
+    <div class="topbar-title">{% if edit_mode %}Edit Product{% else %}Add Product{% endif %}</div>
+    <div class="topbar-right">
+      <div class="topbar-search">
+        <i class="fa fa-search"></i> Search...
+      </div>
+      <div class="topbar-bell"><i class="fa fa-bell-o"></i></div>
+      <div class="topbar-avatar">{{ request.user.username|slice:":2"|upper }}</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+    {% include 'shop/inc/message.html' %}
+
+    <div class="add-product-wrap">
+      <div class="form-card">
+        <div class="form-card-header">
+          <h2>{% if edit_mode %}Edit Product{% else %}Add New Product{% endif %}</h2>
+          <p>{% if edit_mode %}Update the product details below.{% else %}Fill in the details to list on GoCartz{% endif %}</p>
+        </div>
+        <div class="form-card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Product Name -->
+            <div class="field-group">
+              <label>Product Name</label>
+              <input type="text" name="name" placeholder="e.g. Silk Banarasi Dupatta" value="{{ product.name|default_if_none:'' }}" required>
+            </div>
+
+            <!-- Category -->
+            <div class="field-group">
+              <label>Category</label>
+              <div class="select-wrap">
+                <select name="category" required>
+                  <option value="">Select category...</option>
+                  {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if product and product.category.id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="field-group">
+              <label>Description</label>
+              <textarea name="description" placeholder="Describe your product — material, size, occasion...">{{ product.description|default_if_none:'' }}</textarea>
+            </div>
+
+            <div class="form-divider"></div>
+
+            <!-- Price row -->
+            <div class="field-row-2">
+              <div class="field-group">
+                <label>Original Price (₹)</label>
+                <input type="number" name="original_price" placeholder="899" value="{{ product.original_price|default_if_none:'' }}" step="0.01" min="0">
+              </div>
+              <div class="field-group">
+                <label>Selling Price (₹)</label>
+                <input type="number" name="selling_price" placeholder="599" value="{{ product.selling_price|default_if_none:'' }}" step="0.01" min="0" required>
+              </div>
+            </div>
+
+            <!-- Stock + SKU row -->
+            <div class="field-row-2">
+              <div class="field-group">
+                <label>Stock Quantity</label>
+                <input type="number" name="quantity" placeholder="50" value="{{ product.quantity|default_if_none:'' }}" min="0" required>
+              </div>
+              <div class="field-group">
+                <label>SKU <span style="color:#bbb;font-weight:400">(optional)</span></label>
+                <input type="text" name="sku" placeholder="SD-001" value="{{ product.sku|default_if_none:'' }}">
+              </div>
+            </div>
+
+            <!-- Image upload -->
+            <div class="field-group">
+              <label>Product Images</label>
+              <div class="upload-area">
+                <input type="file" name="product_image" accept="image/*">
+                <div class="upload-icon">⬆️</div>
+                <p><strong>Drop images or click to upload</strong></p>
+                <p>PNG, JPG up to 5 MB — multi-image supported</p>
+              </div>
+            </div>
+
+            <div class="form-divider"></div>
+
+            <!-- Toggles -->
+            <div class="toggle-row">
+              <div class="toggle-item">
+                <label class="toggle-switch">
+                  <input type="checkbox" name="trending" id="trending" {% if product and product.trending %}checked{% endif %}>
+                  <span class="toggle-slider gold-toggle"></span>
+                </label>
+                <label for="trending">Trending</label>
+              </div>
+              <div class="toggle-item">
+                <label class="toggle-switch">
+                  <input type="checkbox" name="is_active" id="is_active" {% if product and product.is_active %}checked{% else %}checked{% endif %}>
+                  <span class="toggle-slider"></span>
+                </label>
+                <label for="is_active">Active Listing</label>
+              </div>
+            </div>
+
+            <!-- Smart price tip -->
+            <div class="smart-tip" id="smartPriceTip" style="display: none;">
+              <div class="smart-tip-icon">💡</div>
+              <div>
+                <div class="smart-tip-title">Smart Price Suggestion</div>
+                <div class="smart-tip-text">
+                  Similar items sell for <strong id="priceRange">₹450–₹650</strong> on GoCartz. Price within this range for faster sales.
+                </div>
+              </div>
+            </div>
+
+            <!-- Buttons -->
+            <button type="submit" name="action" value="publish" class="btn-publish">{% if edit_mode %}Update Product{% else %}Publish Product{% endif %}</button>
+            <button type="submit" name="action" value="draft" class="btn-draft">{% if edit_mode %}Save Changes{% else %}Save as Draft{% endif %}</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// Smart Price Suggestion Logic
+document.addEventListener('DOMContentLoaded', function() {
+  const categorySelect = document.querySelector('select[name="category"]');
+  const smartPriceTip = document.getElementById('smartPriceTip');
+  const priceRangeSpan = document.getElementById('priceRange');
+  
+  // Function to fetch smart price
+  function fetchSmartPrice() {
+    const categoryId = categorySelect.value;
+    
+    if (!categoryId) {
+      smartPriceTip.style.display = 'none';
+      return;
+    }
+    
+    // Show loading state
+    smartPriceTip.style.display = 'flex';
+    priceRangeSpan.textContent = 'Loading...';
+    
+    // Fetch smart price from API
+    const formData = new FormData();
+    formData.append('category_id', categoryId);
+    
+    fetch('{% url "get_smart_price" %}', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.min_price && data.max_price) {
+        priceRangeSpan.textContent = `₹${data.min_price}–₹${data.max_price}`;
+        smartPriceTip.style.display = 'flex';
+      } else {
+        priceRangeSpan.textContent = 'Unable to fetch price range';
+        smartPriceTip.style.display = 'flex';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching smart price:', error);
+      priceRangeSpan.textContent = 'Unable to fetch price range';
+      smartPriceTip.style.display = 'flex';
+    });
+  }
+  
+  // Trigger smart price fetch when category changes
+  categorySelect.addEventListener('change', fetchSmartPrice);
+  
+  // Also fetch on page load if category is already selected
+  if (categorySelect.value) {
+    fetchSmartPrice();
+  }
+});
+</script>
+
+{% endblock content %}

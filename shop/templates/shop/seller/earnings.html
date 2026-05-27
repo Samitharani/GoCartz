@@ -1,0 +1,428 @@
+{% extends 'shop/layouts/main.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+
+  :root {
+    --brand-dark:  #7B1C1C;
+    --brand-mid:   #9B2C2C;
+    --brand-gold:  #C8972A;
+    --brand-light: #FDF6EE;
+    --sidebar-w:   220px;
+    --card-radius: 14px;
+    --font-head:   'Sora', sans-serif;
+    --font-body:   'DM Sans', sans-serif;
+  }
+
+  body { font-family: var(--font-body); background: #F5F0EB; }
+
+  /* ════ SHELL ════ */
+  .dash-shell { display: flex; min-height: 100vh; }
+
+  /* ════ SIDEBAR ════ */
+  .dash-sidebar {
+    width: var(--sidebar-w); min-width: var(--sidebar-w);
+    background: var(--brand-dark);
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; bottom: 0;
+    z-index: 200;
+    box-shadow: 4px 0 20px rgba(0,0,0,.18);
+  }
+  .sidebar-logo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 20px 18px 18px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+    text-decoration: none;
+  }
+  .sidebar-logo-icon {
+    width: 38px; height: 38px; background: var(--brand-gold);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-weight: 700; font-size: 15px; color: #fff; flex-shrink: 0;
+  }
+  .sidebar-logo-text { font-family: var(--font-head); font-weight: 700; font-size: 16px; color: #fff; line-height: 1.2; }
+  .sidebar-logo-text span { display: block; font-size: 11px; font-weight: 400; color: rgba(255,255,255,.6); font-family: var(--font-body); }
+
+  .sidebar-vendor {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 18px; border-bottom: 1px solid rgba(255,255,255,.1);
+  }
+  .sidebar-vendor-avatar {
+    width: 36px; height: 36px; background: var(--brand-gold); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-weight: 700; font-size: 14px; color: #fff; flex-shrink: 0;
+  }
+  .sidebar-vendor-name { font-size: 13px; font-weight: 600; color: #fff; line-height: 1.3; }
+  .sidebar-vendor-sub  { font-size: 11px; color: rgba(255,255,255,.55); }
+  .vendor-status { display: inline-block; width: 8px; height: 8px; background: #4ade80; border-radius: 50%; margin-right: 4px; }
+
+  .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+  .sidebar-nav a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 9px;
+    color: rgba(255,255,255,.72); text-decoration: none;
+    font-size: 13.5px; font-weight: 500;
+    transition: background .15s, color .15s;
+    margin-bottom: 2px;
+  }
+  .sidebar-nav a:hover  { background: rgba(255,255,255,.1); color: #fff; }
+  .sidebar-nav a.active { background: rgba(255,255,255,.18); color: #fff; font-weight: 600; }
+  .sidebar-nav a .nav-icon { width: 18px; text-align: center; font-size: 14px; }
+  .sidebar-nav .badge-pill {
+    margin-left: auto; background: #ef4444; color: #fff;
+    font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 20px;
+  }
+  .sidebar-footer {
+    padding: 12px 18px; border-top: 1px solid rgba(255,255,255,.1);
+    font-size: 12px; color: #4ade80; display: flex; align-items: center; gap: 6px;
+  }
+  .sidebar-footer.pending { color: #fbbf24; }
+
+  /* ════ MAIN ════ */
+  .dash-main { margin-left: var(--sidebar-w); flex: 1; padding: 32px 36px; box-sizing: border-box; }
+
+  /* Page title */
+  .page-title {
+    font-family: var(--font-head); font-size: 22px; font-weight: 700;
+    color: #1a1a1a; margin: 0 0 24px 0;
+  }
+
+  /* ── Metric Cards ── */
+  .earnings-metric-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; margin-bottom: 24px;
+  }
+  .e-metric-card {
+    background: #fff; border-radius: var(--card-radius);
+    padding: 22px 24px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.07);
+    display: flex; align-items: flex-start; gap: 16px;
+    transition: box-shadow .2s, transform .2s;
+  }
+  .e-metric-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); transform: translateY(-2px); }
+  .e-metric-icon {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .ei-gold    { background: #FFF3E0; }
+  .ei-orange  { background: #FFF0F0; }
+  .ei-green   { background: #F0FDF4; }
+  .e-metric-body {}
+  .e-metric-label { font-size: 13px; color: #888; font-weight: 500; margin-bottom: 4px; }
+  .e-metric-value {
+    font-family: var(--font-head); font-size: 26px; font-weight: 700;
+    color: #1a1a1a; line-height: 1.1; margin-bottom: 4px;
+  }
+  .e-metric-sub { font-size: 12px; }
+  .sub-neutral { color: #888; }
+  .sub-warn    { color: #f59e0b; font-weight: 600; }
+  .sub-good    { color: #22c55e; font-weight: 600; }
+
+  /* ── Chart card ── */
+  .section-card {
+    background: #fff; border-radius: var(--card-radius);
+    box-shadow: 0 1px 6px rgba(0,0,0,.07);
+    overflow: hidden; margin-bottom: 24px;
+  }
+  .section-card-header {
+    padding: 18px 24px 14px; border-bottom: 1px solid #f0f0f0;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .section-card-header h5 {
+    font-family: var(--font-head); font-size: 15px; font-weight: 700; color: #1a1a1a; margin: 0;
+  }
+  .chart-wrap { padding: 20px 24px 16px; }
+
+  /* ── Bar Chart (pure CSS/JS) ── */
+  .bar-chart-container {
+    position: relative;
+    height: 240px;
+    display: flex;
+    align-items: flex-end;
+    gap: 0;
+  }
+  .bar-chart-y-axis {
+    display: flex; flex-direction: column-reverse;
+    justify-content: space-between;
+    height: 100%; padding-bottom: 24px;
+    margin-right: 8px; flex-shrink: 0;
+  }
+  .bar-chart-y-axis span {
+    font-size: 11px; color: #bbb; text-align: right; line-height: 1;
+  }
+  .bar-chart-bars {
+    flex: 1; display: flex; align-items: flex-end;
+    gap: 12px; height: 100%;
+    border-left: 1.5px solid #e5e7eb;
+    border-bottom: 1.5px solid #e5e7eb;
+    padding: 0 12px 0 12px;
+    position: relative;
+  }
+  /* Gridlines */
+  .bar-chart-bars::before {
+    content: '';
+    position: absolute; left: 0; right: 0; top: 0; bottom: 24px;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent calc(25% - 1px),
+      #f0f0f0 calc(25% - 1px),
+      #f0f0f0 25%
+    );
+    pointer-events: none;
+  }
+  .bar-wrap {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-end;
+    height: 100%; padding-bottom: 24px; position: relative;
+  }
+  .bar {
+    width: 100%; max-width: 52px;
+    background: var(--brand-dark);
+    border-radius: 6px 6px 0 0;
+    transition: background .2s;
+    position: relative;
+    cursor: pointer;
+  }
+  .bar:hover { background: var(--brand-gold); }
+  .bar-tooltip {
+    position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: #1a1a1a; color: #fff; font-size: 11px; font-weight: 600;
+    padding: 4px 8px; border-radius: 6px; white-space: nowrap;
+    opacity: 0; pointer-events: none; transition: opacity .15s;
+  }
+  .bar:hover .bar-tooltip { opacity: 1; }
+  .bar-label {
+    position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%);
+    font-size: 10.5px; color: #999; white-space: nowrap;
+  }
+
+  /* ── Payout table ── */
+  .payout-table { width: 100%; border-collapse: collapse; }
+  .payout-table thead tr { background: var(--brand-dark); color: #fff; }
+  .payout-table thead th {
+    padding: 11px 18px; font-size: 12px; font-weight: 600;
+    letter-spacing: .4px; text-transform: uppercase;
+  }
+  .payout-table tbody tr { border-bottom: 1px solid #f5f5f5; transition: background .12s; }
+  .payout-table tbody tr:hover { background: #fafafa; }
+  .payout-table tbody td { padding: 13px 18px; font-size: 13.5px; color: #333; vertical-align: middle; }
+  .payout-table td.commission-col { color: #ef4444; font-weight: 600; }
+  .payout-table td.net-col { font-weight: 700; color: #1a1a1a; }
+
+  .pay-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 600;
+  }
+  .pay-paid    { background: #dcfce7; color: #166534; }
+  .pay-pending { background: #fef9c3; color: #854d0e; }
+
+  /* Responsive */
+  @media (max-width: 900px) { .earnings-metric-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 768px) { .dash-main { margin-left: 0; padding: 20px 16px; } .dash-sidebar { transform: translateX(-100%); } }
+  @media (max-width: 480px) { .earnings-metric-grid { grid-template-columns: 1fr; } }
+</style>
+
+<div class="dash-shell">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="dash-sidebar">
+    <a href="{% url 'home' %}" class="sidebar-logo">
+      <div class="sidebar-logo-icon">GC</div>
+      <div class="sidebar-logo-text">
+        GoCartz
+        <span>Seller Portal</span>
+      </div>
+    </a>
+
+    <div class="sidebar-vendor">
+      <div class="sidebar-vendor-avatar">{{ request.user.username|slice:":2"|upper }}</div>
+      <div>
+        <div class="sidebar-vendor-name">{{ profile.vendor_name }}</div>
+        <div class="sidebar-vendor-sub"><span class="vendor-status"></span>{{ profile.vendor_city }}</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{% url 'seller_dashboard' %}">
+        <span class="nav-icon"><i class="fa fa-th-large"></i></span> Dashboard
+      </a>
+      <a href="{% url 'seller_products' %}">
+        <span class="nav-icon"><i class="fa fa-box"></i></span> My Products
+      </a>
+      <a href="{% url 'seller_add_product' %}">
+        <span class="nav-icon"><i class="fa fa-plus"></i></span> Add Product
+      </a>
+      <a href="{% url 'seller_orders' %}">
+        <span class="nav-icon"><i class="fa fa-shopping-basket"></i></span> Orders
+        {% if pending_orders > 0 %}<span class="badge-pill">{{ pending_orders }}</span>{% endif %}
+      </a>
+      <a href="{% url 'seller_earnings' %}" class="active">
+        <span class="nav-icon"><i class="fa fa-coins"></i></span> Earnings
+      </a>
+      <a href="{% url 'seller_low_stock' %}">
+        <span class="nav-icon"><i class="fa fa-exclamation-triangle"></i></span> Low Stock
+        {% if low_stock_count > 0 %}<span class="badge-pill">{{ low_stock_count }}</span>{% endif %}
+      </a>
+      <a href="{% url 'logout' %}" style="color:#fca5a5;">
+        <span class="nav-icon"><i class="fa fa-power-off"></i></span> Logout
+      </a>
+    </nav>
+
+    <div class="sidebar-footer {% if not profile.is_vendor_approved %}pending{% endif %}">
+      <i class="fa {% if profile.is_vendor_approved %}fa-check-circle{% else %}fa-clock{% endif %}"></i>
+      {% if profile.is_vendor_approved %}Approved Vendor{% else %}Pending Approval{% endif %}
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main class="dash-main">
+    {% include 'shop/inc/message.html' %}
+
+    <h1 class="page-title">Earnings</h1>
+
+    <!-- ── Metric Cards ── -->
+    <div class="earnings-metric-grid">
+      <div class="e-metric-card">
+        <div class="e-metric-icon ei-gold">💰</div>
+        <div class="e-metric-body">
+          <div class="e-metric-label">Total Earned</div>
+          <div class="e-metric-value">₹{{ earnings.total_earned }}</div>
+          <div class="e-metric-sub sub-neutral">All time</div>
+        </div>
+      </div>
+      <div class="e-metric-card">
+        <div class="e-metric-icon ei-orange">📊</div>
+        <div class="e-metric-body">
+          <div class="e-metric-label">Commission (10%)</div>
+          <div class="e-metric-value">₹{{ earnings.commission }}</div>
+          <div class="e-metric-sub sub-warn">Platform fee deducted</div>
+        </div>
+      </div>
+      <div class="e-metric-card">
+        <div class="e-metric-icon ei-green">✅</div>
+        <div class="e-metric-body">
+          <div class="e-metric-label">Net Earnings</div>
+          <div class="e-metric-value">₹{{ earnings.net_earnings }}</div>
+          <div class="e-metric-sub sub-good">After all deductions</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Weekly Earnings Bar Chart ── -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <h5>Weekly Earnings</h5>
+      </div>
+      <div class="chart-wrap">
+        <div class="bar-chart-container" id="earningsChart">
+          <!-- Rendered by JS below -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Payout History Table ── -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <h5>Payout History</h5>
+      </div>
+      <table class="payout-table">
+        <thead>
+          <tr>
+            <th>Week</th>
+            <th>Orders</th>
+            <th>Gross</th>
+            <th>Commission</th>
+            <th>Net</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in earnings.history %}
+          <tr>
+            <td>{{ row.week }}</td>
+            <td>{{ row.orders }}</td>
+            <td>₹{{ row.gross }}</td>
+            <td class="commission-col">−₹{{ row.commission }}</td>
+            <td class="net-col">₹{{ row.net }}</td>
+            <td>
+              {% if row.status == 'Paid' %}
+                <span class="pay-badge pay-paid">Paid</span>
+              {% else %}
+                <span class="pay-badge pay-pending">{{ row.status }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Build bar chart from Django context data passed as JSON
+  const historyData = [
+    {% for row in earnings.history %}
+      { label: "{{ row.week }}", value: {{ row.net }} }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  function renderChart(data) {
+    const container = document.getElementById('earningsChart');
+    if (!data.length) { container.innerHTML = '<p style="color:#aaa;font-size:13px;">No data yet.</p>'; return; }
+
+    const maxVal = Math.max(...data.map(d => d.value));
+    // Round up to nice y-axis max
+    const yMax = Math.ceil(maxVal / 5000) * 5000 || 20000;
+    const steps = 4;
+
+    // Y axis
+    const yAxis = document.createElement('div');
+    yAxis.className = 'bar-chart-y-axis';
+    for (let i = 0; i <= steps; i++) {
+      const s = document.createElement('span');
+      const v = Math.round((yMax / steps) * i);
+      s.textContent = v >= 1000 ? '₹' + (v/1000) + 'k' : '₹' + v;
+      yAxis.appendChild(s);
+    }
+    container.appendChild(yAxis);
+
+    // Bars wrapper
+    const barsDiv = document.createElement('div');
+    barsDiv.className = 'bar-chart-bars';
+
+    data.forEach(d => {
+      const wrap = document.createElement('div');
+      wrap.className = 'bar-wrap';
+
+      const bar = document.createElement('div');
+      bar.className = 'bar';
+      const pct = (d.value / yMax) * 100;
+      bar.style.height = pct + '%';
+
+      const tip = document.createElement('div');
+      tip.className = 'bar-tooltip';
+      tip.textContent = '₹' + d.value.toLocaleString('en-IN');
+      bar.appendChild(tip);
+
+      const lbl = document.createElement('div');
+      lbl.className = 'bar-label';
+      lbl.textContent = d.label;
+
+      wrap.appendChild(bar);
+      wrap.appendChild(lbl);
+      barsDiv.appendChild(wrap);
+    });
+
+    container.appendChild(barsDiv);
+  }
+
+  renderChart(historyData);
+</script>
+
+{% endblock content %}

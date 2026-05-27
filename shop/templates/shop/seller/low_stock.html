@@ -1,0 +1,332 @@
+{% extends 'shop/layouts/main.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+
+  :root {
+    --brand-dark:  #7B1C1C;
+    --brand-gold:  #C8972A;
+    --sidebar-w:   220px;
+    --card-radius: 14px;
+    --font-head:   'Sora', sans-serif;
+    --font-body:   'DM Sans', sans-serif;
+  }
+
+  body { font-family: var(--font-body); background: #F5F0EB; }
+  .dash-shell { display: flex; min-height: 100vh; }
+
+  /* ════ SIDEBAR ════ */
+  .dash-sidebar {
+    width: var(--sidebar-w); min-width: var(--sidebar-w);
+    background: var(--brand-dark);
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; bottom: 0;
+    z-index: 200; box-shadow: 4px 0 20px rgba(0,0,0,.18);
+  }
+  .sidebar-logo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 20px 18px 18px;
+    border-bottom: 1px solid rgba(255,255,255,.12); text-decoration: none;
+  }
+  .sidebar-logo-icon {
+    width: 38px; height: 38px; background: var(--brand-gold); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-weight: 700; font-size: 15px; color: #fff; flex-shrink: 0;
+  }
+  .sidebar-logo-text { font-family: var(--font-head); font-weight: 700; font-size: 16px; color: #fff; line-height: 1.2; }
+  .sidebar-logo-text span { display: block; font-size: 11px; font-weight: 400; color: rgba(255,255,255,.6); font-family: var(--font-body); }
+
+  .sidebar-vendor {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 18px; border-bottom: 1px solid rgba(255,255,255,.1);
+  }
+  .sidebar-vendor-avatar {
+    width: 36px; height: 36px; background: var(--brand-gold); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-weight: 700; font-size: 14px; color: #fff; flex-shrink: 0;
+  }
+  .sidebar-vendor-name { font-size: 13px; font-weight: 600; color: #fff; line-height: 1.3; }
+  .sidebar-vendor-sub  { font-size: 11px; color: rgba(255,255,255,.55); }
+  .vendor-status { display: inline-block; width: 8px; height: 8px; background: #4ade80; border-radius: 50%; margin-right: 4px; }
+
+  .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; }
+  .sidebar-nav a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 9px;
+    color: rgba(255,255,255,.72); text-decoration: none;
+    font-size: 13.5px; font-weight: 500;
+    transition: background .15s, color .15s; margin-bottom: 2px;
+  }
+  .sidebar-nav a:hover  { background: rgba(255,255,255,.1); color: #fff; }
+  .sidebar-nav a.active { background: rgba(255,255,255,.18); color: #fff; font-weight: 600; }
+  .sidebar-nav a .nav-icon { width: 18px; text-align: center; font-size: 14px; }
+  .sidebar-nav .badge-pill {
+    margin-left: auto; background: #ef4444; color: #fff;
+    font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 20px;
+  }
+  .sidebar-footer {
+    padding: 12px 18px; border-top: 1px solid rgba(255,255,255,.1);
+    font-size: 12px; color: #4ade80; display: flex; align-items: center; gap: 6px;
+  }
+  .sidebar-footer.pending { color: #fbbf24; }
+
+  /* ════ MAIN ════ */
+  .dash-main { margin-left: var(--sidebar-w); flex: 1; padding: 32px 36px; box-sizing: border-box; }
+
+  .page-title {
+    font-family: var(--font-head); font-size: 22px; font-weight: 700;
+    color: #1a1a1a; margin: 0 0 20px 0;
+  }
+
+  /* ── Alert banner ── */
+  .restock-alert {
+    background: #FFF5F5;
+    border: 1px solid #FECACA;
+    border-left: 4px solid #EF4444;
+    border-radius: var(--card-radius);
+    padding: 14px 20px;
+    display: flex; align-items: flex-start; gap: 12px;
+    margin-bottom: 24px;
+  }
+  .restock-alert-icon { font-size: 18px; margin-top: 1px; }
+  .restock-alert-title { font-weight: 700; font-size: 14px; color: #991B1B; margin-bottom: 2px; }
+  .restock-alert-sub   { font-size: 13px; color: #B91C1C; }
+
+  /* ── Empty state banner ── */
+  .empty-banner {
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+    border-left: 4px solid #22C55E;
+    border-radius: var(--card-radius);
+    padding: 20px 24px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .empty-banner-icon { font-size: 28px; }
+  .empty-banner-title { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: #166534; margin-bottom: 2px; }
+  .empty-banner-sub   { font-size: 13px; color: #15803D; }
+
+  /* ── Product cards grid ── */
+  .lowstock-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .ls-card {
+    background: #fff;
+    border-radius: var(--card-radius);
+    box-shadow: 0 1px 6px rgba(0,0,0,.07);
+    overflow: hidden;
+    transition: box-shadow .2s, transform .2s;
+  }
+  .ls-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.12); transform: translateY(-2px); }
+
+  /* Product image — tall, full-width */
+  .ls-card-img {
+    width: 100%; height: 220px; object-fit: cover; display: block;
+  }
+  .ls-card-img-placeholder {
+    width: 100%; height: 220px;
+    background: #ece8e2;
+    display: flex; align-items: center; justify-content: center;
+    color: #bbb; font-size: 48px;
+  }
+
+  /* Card body */
+  .ls-card-body { padding: 18px 20px 20px; }
+  .ls-card-name {
+    font-family: var(--font-head); font-size: 17px; font-weight: 700;
+    color: #1a1a1a; margin-bottom: 2px;
+  }
+  .ls-card-meta { font-size: 12.5px; color: #999; margin-bottom: 14px; }
+
+  /* Units left */
+  .ls-units-row {
+    display: flex; align-items: baseline; gap: 6px;
+    margin-bottom: 14px;
+  }
+  .ls-units-num {
+    font-family: var(--font-head); font-size: 32px; font-weight: 700;
+    color: var(--brand-dark); line-height: 1;
+  }
+  .ls-units-label { font-size: 14px; color: #555; font-weight: 500; }
+
+  /* Stepper */
+  .ls-stepper {
+    display: flex; align-items: center; gap: 0;
+    margin-bottom: 14px;
+  }
+  .stepper-btn {
+    width: 36px; height: 40px;
+    background: #fff; border: 1.5px solid #e5e7eb;
+    border-radius: 8px 0 0 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: #555;
+    cursor: pointer; transition: background .15s;
+    user-select: none;
+  }
+  .stepper-btn.plus { border-radius: 0 8px 8px 0; }
+  .stepper-btn:hover { background: #f5f0eb; color: var(--brand-dark); }
+  .stepper-input {
+    flex: 1; height: 40px;
+    border: 1.5px solid #e5e7eb; border-left: none; border-right: none;
+    text-align: center;
+    font-family: var(--font-head); font-size: 15px; font-weight: 600;
+    color: #1a1a1a; background: #FFFBF0;
+    outline: none;
+  }
+
+  /* Restock button */
+  .btn-restock {
+    display: block; width: 100%;
+    background: var(--brand-dark); color: #fff;
+    border: none; border-radius: 10px;
+    padding: 13px 0;
+    font-family: var(--font-head); font-size: 14px; font-weight: 700;
+    cursor: pointer; text-align: center; text-decoration: none;
+    transition: background .2s, transform .15s;
+  }
+  .btn-restock:hover { background: #5a1414; color: #fff; transform: translateY(-1px); }
+
+  /* Responsive */
+  @media (max-width: 900px) { .lowstock-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 768px) { .dash-main { margin-left: 0; padding: 20px 16px; } .dash-sidebar { transform: translateX(-100%); } }
+</style>
+
+<div class="dash-shell">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="dash-sidebar">
+    <a href="{% url 'home' %}" class="sidebar-logo">
+      <div class="sidebar-logo-icon">GC</div>
+      <div class="sidebar-logo-text">
+        GoCartz
+        <span>Seller Portal</span>
+      </div>
+    </a>
+
+    <div class="sidebar-vendor">
+      <div class="sidebar-vendor-avatar">{{ request.user.username|slice:":2"|upper }}</div>
+      <div>
+        <div class="sidebar-vendor-name">{{ profile.vendor_name }}</div>
+        <div class="sidebar-vendor-sub"><span class="vendor-status"></span>{{ profile.vendor_city }}</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{% url 'seller_dashboard' %}">
+        <span class="nav-icon"><i class="fa fa-th-large"></i></span> Dashboard
+      </a>
+      <a href="{% url 'seller_products' %}">
+        <span class="nav-icon"><i class="fa fa-box"></i></span> My Products
+      </a>
+      <a href="{% url 'seller_add_product' %}">
+        <span class="nav-icon"><i class="fa fa-plus"></i></span> Add Product
+      </a>
+      <a href="{% url 'seller_orders' %}">
+        <span class="nav-icon"><i class="fa fa-shopping-basket"></i></span> Orders
+        {% if pending_orders > 0 %}<span class="badge-pill">{{ pending_orders }}</span>{% endif %}
+      </a>
+      <a href="{% url 'seller_earnings' %}">
+        <span class="nav-icon"><i class="fa fa-coins"></i></span> Earnings
+      </a>
+      <a href="{% url 'seller_low_stock' %}" class="active">
+        <span class="nav-icon"><i class="fa fa-exclamation-triangle"></i></span> Low Stock
+        {% if products %}<span class="badge-pill">{{ products|length }}</span>{% endif %}
+      </a>
+      <a href="{% url 'logout' %}" style="color:#fca5a5;">
+        <span class="nav-icon"><i class="fa fa-power-off"></i></span> Logout
+      </a>
+    </nav>
+
+    <div class="sidebar-footer {% if not profile.is_vendor_approved %}pending{% endif %}">
+      <i class="fa {% if profile.is_vendor_approved %}fa-check-circle{% else %}fa-clock{% endif %}"></i>
+      {% if profile.is_vendor_approved %}Approved Vendor{% else %}Pending Approval{% endif %}
+    </div>
+  </aside>
+
+  <!-- ══ MAIN ══ -->
+  <main class="dash-main">
+    {% include 'shop/inc/message.html' %}
+
+    <h1 class="page-title">Low Stock</h1>
+
+    {% if products %}
+
+      <!-- Alert banner -->
+      <div class="restock-alert">
+        <div class="restock-alert-icon">⚠️</div>
+        <div>
+          <div class="restock-alert-title">{{ products|length }} product{{ products|length|pluralize }} need{{ products|length|pluralize:"s," }} immediate restocking</div>
+          <div class="restock-alert-sub">Low stock can lead to missed sales and lower search ranking on GoCartz.</div>
+        </div>
+      </div>
+
+      <!-- Cards -->
+      <div class="lowstock-grid">
+        {% for product in products %}
+        <div class="ls-card">
+
+          <!-- Image -->
+          {% if product.product_image %}
+            <img src="{{ product.product_image.url }}" alt="{{ product.name }}" class="ls-card-img">
+          {% else %}
+            <div class="ls-card-img-placeholder"><i class="fa fa-image"></i></div>
+          {% endif %}
+
+          <div class="ls-card-body">
+            <div class="ls-card-name">{{ product.name }}</div>
+            <div class="ls-card-meta">{{ product.category }} · SKU: {{ product.sku }}</div>
+
+            <!-- Units left -->
+            <div class="ls-units-row">
+              <span class="ls-units-num">{{ product.quantity }}</span>
+              <span class="ls-units-label">units left</span>
+            </div>
+
+            <!-- Quantity stepper -->
+            <form method="POST" action="{% url 'seller_restock_product' product.id %}">
+              {% csrf_token %}
+              <div class="ls-stepper">
+                <button type="button" class="stepper-btn minus" onclick="stepQty(this, -1)">−</button>
+                <input type="number" name="restock_qty" class="stepper-input" value="{{ product.quantity }}" min="1" id="qty-{{ product.id }}">
+                <button type="button" class="stepper-btn plus" onclick="stepQty(this, 1)">+</button>
+              </div>
+              <button type="submit" class="btn-restock">Restock Now</button>
+            </form>
+
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+    {% else %}
+
+      <!-- Empty state -->
+      <div class="empty-banner">
+        <div class="empty-banner-icon">✅</div>
+        <div>
+          <div class="empty-banner-title">All products are well stocked!</div>
+          <div class="empty-banner-sub">Nice work — no low-stock items at the moment. Keep it up!</div>
+        </div>
+      </div>
+
+    {% endif %}
+
+  </main>
+</div>
+
+<script>
+  function stepQty(btn, delta) {
+    const stepper = btn.closest('.ls-stepper');
+    const input = stepper.querySelector('.stepper-input');
+    const current = parseInt(input.value) || 1;
+    const next = current + delta;
+    if (next >= 1) input.value = next;
+  }
+</script>
+
+{% endblock content %}

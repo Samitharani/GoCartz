@@ -1,0 +1,210 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block admin_content %}
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+
+:root {
+  --brand-dark: #7B1C1C;
+  --brand-gold: #C8972A;
+  --font-head:  'Sora', sans-serif;
+  --font-body:  'DM Sans', sans-serif;
+  --card-radius: 14px;
+}
+
+body { font-family: var(--font-body); background: #F5F0EB; }
+
+.page-title {
+  font-family: var(--font-head);
+  font-size: 24px; font-weight: 700;
+  color: #1a1a1a; margin: 0 0 20px 0;
+}
+
+.filter-tabs {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.filter-tab {
+  padding: 8px 20px;
+  border-radius: 30px;
+  border: 1.5px solid #e5e7eb;
+  background: #fff;
+  font-size: 13.5px; font-weight: 600;
+  color: #555; cursor: pointer;
+  transition: all .15s;
+  font-family: var(--font-body);
+}
+.filter-tab:hover { border-color: var(--brand-dark); color: var(--brand-dark); }
+.filter-tab.active {
+  background: var(--brand-dark); color: #fff;
+  border-color: var(--brand-dark);
+}
+
+.orders-card {
+  background: #fff;
+  border-radius: var(--card-radius);
+  box-shadow: 0 1px 6px rgba(0,0,0,.07);
+  overflow: hidden;
+}
+
+.orders-table { width: 100%; border-collapse: collapse; }
+.orders-table thead tr { background: var(--brand-dark); }
+.orders-table thead th {
+  padding: 13px 18px;
+  font-size: 12px; font-weight: 700;
+  color: var(--brand-gold);
+  letter-spacing: .5px; text-transform: uppercase;
+  white-space: nowrap; text-align: left;
+}
+.orders-table tbody tr {
+  border-bottom: 1px solid #f5f5f5;
+  transition: background .12s;
+}
+.orders-table tbody tr:hover { background: #fdf8f2; }
+.orders-table tbody td {
+  padding: 14px 18px;
+  font-size: 13.5px; color: #333;
+  vertical-align: middle;
+}
+
+.order-id {
+  font-family: var(--font-head);
+  font-weight: 700; color: var(--brand-dark);
+}
+
+.buyer-name  { font-weight: 600; color: #1a1a1a; }
+.vendor-name { color: #888; font-size: 13px; }
+
+.order-amount { font-family: var(--font-head); font-weight: 700; color: #1a1a1a; }
+
+.status-pill {
+  display: inline-block; padding: 4px 14px;
+  border-radius: 20px; font-size: 12px; font-weight: 700;
+}
+.pill-delivered  { background: #d1fae5; color: #065f46; }
+.pill-shipped    { background: #cffafe; color: #0e7490; }
+.pill-confirmed  { background: #fef3c7; color: #92400e; }
+.pill-placed     { background: #e0e7ff; color: #3730a3; }
+.pill-cancelled  { background: #fee2e2; color: #991b1b; }
+
+.empty-orders {
+  text-align: center; padding: 72px 20px;
+}
+.empty-orders span { font-size: 52px; display: block; margin-bottom: 14px; }
+.empty-orders h5 {
+  font-family: var(--font-head); font-size: 17px;
+  font-weight: 700; color: #555; margin-bottom: 6px;
+}
+.empty-orders p { font-size: 13.5px; color: #aaa; }
+</style>
+
+<h1 class="page-title">All Orders</h1>
+
+<div class="filter-tabs">
+  <button class="filter-tab active" onclick="filterOrders('all', this)">All</button>
+  <button class="filter-tab" onclick="filterOrders('Placed', this)">Placed</button>
+  <button class="filter-tab" onclick="filterOrders('Confirmed', this)">Confirmed</button>
+  <button class="filter-tab" onclick="filterOrders('Shipped', this)">Shipped</button>
+  <button class="filter-tab" onclick="filterOrders('Delivered', this)">Delivered</button>
+  <button class="filter-tab" onclick="filterOrders('Cancelled', this)">Cancelled</button>
+</div>
+
+<div class="orders-card">
+  {% if orders %}
+
+  <table class="orders-table" id="ordersTable">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Buyer</th>
+        <th>Vendor</th>
+        <th>Product</th>
+        <th>Amount</th>
+        <th>Date</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+      {% with first_item=order.items.first %}
+      <tr data-status="{{ order.status }}">
+        <td><span class="order-id">#ORD-{{ order.id }}</span></td>
+        <td><span class="buyer-name">{{ order.user.get_full_name|default:order.user.username }}</span></td>
+        <td>
+          <span class="vendor-name">
+            {% if first_item and first_item.product %}
+              {{ first_item.product.vendor.vendor_name|default:first_item.product.vendor }}
+            {% else %}N/A{% endif %}
+          </span>
+        </td>
+        <td>
+          {% if first_item and first_item.product %}
+            {{ first_item.product.name|truncatechars:28 }}
+          {% else %}—{% endif %}
+        </td>
+        <td><span class="order-amount">₹{{ order.total_price }}</span></td>
+        <td>{{ order.created_at|date:"M d, Y" }}</td>
+        <td>
+          {% if order.status == 'Delivered' %}
+            <span class="status-pill pill-delivered">Delivered</span>
+          {% elif order.status == 'Shipped' %}
+            <span class="status-pill pill-shipped">Shipped</span>
+          {% elif order.status == 'Confirmed' %}
+            <span class="status-pill pill-confirmed">Confirmed</span>
+          {% elif order.status == 'Placed' %}
+            <span class="status-pill pill-placed">Placed</span>
+          {% elif order.status == 'Cancelled' %}
+            <span class="status-pill pill-cancelled">Cancelled</span>
+          {% else %}
+            <span class="status-pill pill-placed">{{ order.status }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endwith %}
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div id="noFilterResults" style="display:none;">
+    <div class="empty-orders">
+      <span>🔍</span>
+      <h5>No orders with this status</h5>
+      <p>Try selecting a different filter above.</p>
+    </div>
+  </div>
+
+  {% else %}
+
+  <div class="empty-orders">
+    <span>📦</span>
+    <h5>No orders found</h5>
+    <p>Orders placed by customers will appear here.</p>
+  </div>
+
+  {% endif %}
+</div>
+
+<script>
+  function filterOrders(status, btn) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+
+    const rows = document.querySelectorAll('#ordersTable tbody tr');
+    let visible = 0;
+
+    rows.forEach(row => {
+      if (status === 'all' || row.dataset.status === status) {
+        row.style.display = '';
+        visible++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    const noResults = document.getElementById('noFilterResults');
+    if (noResults) noResults.style.display = visible === 0 ? 'block' : 'none';
+  }
+</script>
+
+{% endblock %}

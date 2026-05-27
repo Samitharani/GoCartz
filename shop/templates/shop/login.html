@@ -1,100 +1,385 @@
 {% extends 'shop/layouts/main.html' %}
 {% load static %}
-{% block title %}
-  Login | GoCartz
-{% endblock %}
+
 {% block content %}
+
 <style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
+/* ===== HIDE NORMAL NAVBAR & FOOTER ON LOGIN ===== */
+nav, footer { display: none !important; }
+body { margin: 0; padding: 0; }
 
-  .login-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh; /* full screen height */
-    background: linear-gradient(rgba(139, 0, 0, 0.35), rgba(139, 0, 0, 0.35)),
-                url('{% static "images/login.jpg" %}') center/cover no-repeat;
-     border-top: 5px solid #D4AF37;
-  }
+/* ===== FULL PAGE ===== */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: url('https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1600&q=80') center/cover no-repeat fixed;
+  position: relative;
+}
+.login-page::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: rgba(90, 14, 14, 0.72);
+  z-index: 0;
+}
 
-  .login-card {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0px 8px 20px rgba(0,0,0,0.2);
-    max-width: 400px;
-    width: 100%;
-    animation: fadeInUp 0.6s ease-in-out;
-  }
+/* ===== MINI NAVBAR ===== */
+.login-nav {
+  position: relative; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 52px;
+  background: rgba(60, 8, 8, 0.55);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(212,175,55,0.2);
+}
+.login-nav-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; color: #D4AF37; font-weight: 600;
+  display: flex; align-items: center; gap: 10px;
+}
+.login-nav-badge {
+  font-size: 10px; font-weight: 700;
+  background: rgba(212,175,55,0.15);
+  border: 1px solid rgba(212,175,55,0.4);
+  color: #D4AF37; padding: 2px 8px; border-radius: 20px;
+  letter-spacing: 1px;
+}
+.login-nav-right {
+  font-size: 12px; color: rgba(212,175,55,0.7);
+  display: flex; align-items: center; gap: 6px;
+}
 
-  .login-card h4 {
-    color: #8B0000;
-    font-weight: bold;
-    margin-bottom: 20px;
-    text-align: center;
-  }
+/* ===== CENTER CARD ===== */
+.login-center {
+  flex: 1; display: flex;
+  align-items: center; justify-content: center;
+  padding: 32px 16px;
+  position: relative; z-index: 10;
+}
 
-  .form-control {
-    border-radius: 10px;
-    padding: 10px 15px;
-    border: 1px solid #ccc;
-  }
+.login-card {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%; max-width: 440px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  overflow: hidden;
+  border-top: 4px solid #D4AF37;
+}
 
-  .btn-login {
-    background-color: #D4AF37;
-    color: #8B0000;
-    font-weight: bold;
-    border: none;
-    padding: 10px;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-    width: 100%;
-  }
+.login-card-body {
+  padding: 36px 40px 32px;
+}
 
-  .btn-login:hover {
-    background-color: #bfa030;
-    transform: translateY(-2px);
-  }
+/* ===== BRAND INSIDE CARD ===== */
+.card-brand {
+  display: flex; flex-direction: column;
+  align-items: center; margin-bottom: 24px;
+}
+.card-brand-icon {
+  width: 56px; height: 56px; border-radius: 14px;
+  background: #7B1C1C;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 16px rgba(123,28,28,0.3);
+}
+.card-brand-icon svg { width: 28px; height: 28px; fill: #D4AF37; }
+.card-brand h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; color: #7B1C1C;
+  font-weight: 600; margin: 0 0 3px;
+}
+.card-brand p {
+  font-size: 12px; color: #999; margin: 0;
+}
 
-  .login-footer {
-    text-align: center;
-    margin-top: 15px;
-  }
+/* ===== SIGN IN AS LABEL ===== */
+.signin-label {
+  text-align: center;
+  font-size: 11px; font-weight: 700;
+  color: #aaa; letter-spacing: 1.5px;
+  text-transform: uppercase; margin-bottom: 12px;
+}
 
-  .login-footer a {
-    color: #8B0000;
-    text-decoration: none;
-  }
+/* ===== ROLE TABS ===== */
+.role-tabs {
+  display: flex; gap: 0;
+  background: #f5f0e8; border-radius: 10px;
+  padding: 4px; margin-bottom: 24px;
+}
+.role-tab {
+  flex: 1; text-align: center;
+  padding: 9px 8px; border-radius: 8px;
+  font-size: 13px; font-weight: 500;
+  color: #888; cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+.role-tab:hover { color: #7B1C1C; }
+.role-tab.active {
+  background: #7B1C1C; color: #D4AF37;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(123,28,28,0.25);
+}
 
-  .login-footer a:hover {
-    text-decoration: underline;
-  }
+/* ===== FORM ===== */
+.field-label {
+  font-size: 11px; font-weight: 700;
+  color: #aaa; letter-spacing: 1px;
+  text-transform: uppercase; margin-bottom: 6px;
+  display: block;
+}
+.auth-input {
+  width: 100%; padding: 12px 14px;
+  background: #fdf6e8 !important;
+  border: 1.5px solid #f0e6c8 !important;
+  border-radius: 10px !important;
+  font-size: 14px; color: #333;
+  font-family: 'DM Sans', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.auth-input:focus {
+  border-color: #7B1C1C !important;
+  box-shadow: 0 0 0 3px rgba(123,28,28,0.08) !important;
+}
+.auth-input::placeholder { color: #bbb; }
+.password-wrap { position: relative; }
+.password-wrap .eye-btn {
+  position: absolute; right: 14px; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: #bbb; font-size: 15px; padding: 0;
+}
+.password-wrap .eye-btn:hover { color: #7B1C1C; }
+
+.forgot-row {
+  text-align: right; margin-bottom: 18px;
+}
+.forgot-row a {
+  font-size: 12px; color: #7B1C1C;
+  text-decoration: none; font-weight: 500;
+}
+.forgot-row a:hover { text-decoration: underline; }
+
+/* ===== LOGIN BUTTON ===== */
+.btn-login {
+  width: 100%; padding: 13px;
+  background: #D4AF37; color: #7B1C1C;
+  border: none; border-radius: 10px;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.3px;
+}
+.btn-login:hover {
+  background: #c9a42e;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(212,175,55,0.3);
+}
+
+/* ===== OR DIVIDER ===== */
+.or-divider {
+  display: flex; align-items: center; gap: 10px;
+  margin: 18px 0 14px;
+}
+.or-divider::before, .or-divider::after {
+  content: ''; flex: 1;
+  height: 1px; background: #eee;
+}
+.or-divider span { font-size: 12px; color: #bbb; }
+
+/* ===== SIGNUP ROW ===== */
+.signup-row {
+  text-align: center; font-size: 13px;
+  color: #666; margin-bottom: 16px;
+}
+.signup-row a {
+  color: #7B1C1C; font-weight: 700;
+  text-decoration: none;
+}
+.signup-row a:hover { text-decoration: underline; }
+
+/* ===== VENDOR CTA ===== */
+.vendor-cta {
+  display: flex; align-items: center;
+  background: #fdf6e8;
+  border-radius: 12px; padding: 13px 16px;
+  gap: 12px; cursor: pointer;
+  border: 1px solid #f0e6c8;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.vendor-cta:hover { background: #f9edd6; }
+.vendor-cta-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: #7B1C1C; display: flex;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.vendor-cta-icon svg { width: 18px; height: 18px; fill: #D4AF37; }
+.vendor-cta-text { flex: 1; }
+.vendor-cta-text strong {
+  display: block; font-size: 13px;
+  color: #333; font-weight: 600;
+}
+.vendor-cta-text span {
+  font-size: 11px; color: #999;
+}
+.vendor-cta-arrow { color: #bbb; font-size: 16px; }
+
+/* ===== ADMIN NOTICE ===== */
+.admin-notice {
+  background: #fff8e1; border: 1px solid #ffe082;
+  border-radius: 10px; padding: 12px 14px;
+  font-size: 12px; color: #856404;
+  text-align: center; margin-bottom: 16px;
+  display: none;
+}
+.admin-notice.show { display: block; }
 </style>
 
-<div class="login-wrapper">
-  <div class="login-card">
-    <h4>User Login</h4>
-    {% include 'shop/inc/message.html' %}
-    <form method="post" action="">
-      {% csrf_token %}
-      <div class="mb-4">
-        <label for="username" class="form-label">User Name</label>
-        <input type="text" name="username" id="username" class="form-control" placeholder="Enter User Name" required>
-      </div>
-      <div class="mb-4">
-        <label for="password" class="form-label">Password</label>
-        <input type="password" name="password" id="password" class="form-control" placeholder="Enter Password" required>
-      </div>
-      <button type="submit" class="btn-login">Login</button>
-    </form>
-    <div class="login-footer">
-      <p><a href="#">Forgot Password?</a></p>
-      <p>Don't have an account? <a href="{% url 'register' %}">Sign Up</a></p>
+<div class="login-page">
+
+  <!-- Mini Navbar -->
+  <div class="login-nav">
+    <div class="login-nav-brand">
+      GoCartz
+      <span class="login-nav-badge">HYPERLOCAL</span>
+    </div>
+    <div class="login-nav-right">
+      <i class="fa fa-shopping-bag"></i>
+      Multi-Vendor Commerce
     </div>
   </div>
+
+  <!-- Card -->
+  <div class="login-center">
+    <div class="login-card">
+      <div class="login-card-body">
+
+        <!-- Brand -->
+        <div class="card-brand">
+          <div class="card-brand-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/>
+            </svg>
+          </div>
+          <h1>GoCartz</h1>
+          <p>Try On. Talk Smart. Shop Easy.</p>
+        </div>
+
+        {% include 'shop/inc/message.html' %}
+
+        <!-- Sign in as -->
+        <div class="signin-label">SIGN IN AS</div>
+
+        <!-- Role Tabs -->
+        <div class="role-tabs">
+          <a href="{% url 'login' %}?role=buyer"
+             class="role-tab {% if selected_role == 'buyer' or not selected_role %}active{% endif %}">
+            Buyer
+          </a>
+          <a href="{% url 'login' %}?role=seller"
+             class="role-tab {% if selected_role == 'seller' %}active{% endif %}">
+            Seller
+          </a>
+          <a href="{% url 'login' %}?role=admin"
+             class="role-tab {% if selected_role == 'admin' %}active{% endif %}"
+             id="adminTab">
+            Admin
+          </a>
+        </div>
+
+        <!-- Admin Notice -->
+        <div class="admin-notice {% if selected_role == 'admin' %}show{% endif %}" id="adminNotice">
+          <i class="fa fa-lock"></i>
+          Admin access is restricted. You will be redirected to the secure admin portal.
+        </div>
+
+        <!-- Login Form -->
+        <form method="post" action="" id="loginForm">
+          {% csrf_token %}
+          <input type="hidden" name="role" value="{{ selected_role|default:'buyer' }}">
+
+          <div class="mb-3">
+            <label class="field-label">USERNAME / EMAIL</label>
+            <input type="text" name="username" id="username"
+                   class="auth-input"
+                   placeholder="Enter your username or email" required>
+          </div>
+
+          <div class="mb-2">
+            <label class="field-label">PASSWORD</label>
+            <div class="password-wrap">
+              <input type="password" name="password" id="password"
+                     class="auth-input"
+                     placeholder="Enter your password" required>
+              <button type="button" class="eye-btn" onclick="togglePassword()">
+                <i class="fa fa-eye" id="eyeIcon"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="forgot-row">
+            <a href="#">Forgot Password?</a>
+          </div>
+
+          <button type="submit" class="btn-login">
+            Login to GoCartz
+          </button>
+        </form>
+
+        <div class="or-divider"><span>or</span></div>
+
+        <div class="signup-row">
+          Don't have an account?
+          <a href="{% url 'register' %}?role=buyer">Sign Up</a>
+        </div>
+
+        <!-- Vendor CTA -->
+        <a href="{% url 'register' %}?role=seller" class="vendor-cta">
+          <div class="vendor-cta-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </div>
+          <div class="vendor-cta-text">
+            <strong>Want to sell on GoCartz?</strong>
+            <span>Become a Vendor →</span>
+          </div>
+          <span class="vendor-cta-arrow">›</span>
+        </a>
+
+      </div>
+    </div>
+  </div>
+
 </div>
 
 {% endblock content %}
+
+{% block scripts %}
+<script>
+// Show admin notice when admin tab is active
+document.addEventListener('DOMContentLoaded', function() {
+  const role = new URLSearchParams(window.location.search).get('role');
+  if (role === 'admin') {
+    document.getElementById('adminNotice').classList.add('show');
+  }
+});
+
+// Toggle password visibility
+function togglePassword() {
+  const pwd = document.getElementById('password');
+  const icon = document.getElementById('eyeIcon');
+  if (pwd.type === 'password') {
+    pwd.type = 'text';
+    icon.className = 'fa fa-eye-slash';
+  } else {
+    pwd.type = 'password';
+    icon.className = 'fa fa-eye';
+  }
+}
+</script>
+{% endblock scripts %}

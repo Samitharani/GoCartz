@@ -1,0 +1,60 @@
+{% extends 'shop/layouts/main.html' %}
+{% load static %}
+
+{% block content %}
+<div style="max-width:680px;margin:80px auto;padding:24px;background:#fff;border-radius:12px;">
+  <h3 style="margin-bottom:12px;">Complete Payment</h3>
+  <p>Order #: {{ order.id }} — Amount: ₹{{ total_amount }}</p>
+  <div id="payment-status" style="margin-top:18px;color:#444;"></div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return '';
+  }
+
+  (function(){
+    const options = {
+      key: '{{ razorpay_key }}',
+      amount: {{ razorpay_order.amount }}, // amount in paise
+      currency: '{{ razorpay_order.currency }}',
+      name: 'GoCartz',
+      description: 'Order #{{ order.id }}',
+      order_id: '{{ razorpay_order.id }}',
+      handler: function (response){
+        const data = new FormData();
+        data.append('razorpay_payment_id', response.razorpay_payment_id);
+        data.append('razorpay_order_id', response.razorpay_order_id);
+        data.append('razorpay_signature', response.razorpay_signature);
+        data.append('order_id', '{{ order.id }}');
+
+        fetch('{% url 'payment_verify' %}', {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+          },
+          body: data,
+          credentials: 'same-origin'
+        }).then(r=>r.json()).then(j=>{
+          if(j.success){
+            window.location.href = '{% url "orders" %}';
+          } else {
+            document.getElementById('payment-status').innerText = 'Payment verification failed: ' + (j.error||'');
+          }
+        }).catch(e=>{
+          document.getElementById('payment-status').innerText = 'Payment verification error';
+        });
+      },
+      modal: { escape: false }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.open();
+  })();
+</script>
+
+{% endblock %}

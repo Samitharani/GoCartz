@@ -1,0 +1,100 @@
+{% extends 'shop/layouts/main.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
+  :root {
+    --brand-dark: #7B1C1C;
+    --brand-gold: #C8972A;
+    --brand-light: #FDF6EE;
+    --sidebar-w: 240px;
+    --card-radius: 16px;
+    --font-head: 'Sora', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+  body { font-family: var(--font-body); background: #F5F0EB; }
+  .dash-shell { display: flex; min-height: 100vh; }
+  .dash-sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: var(--brand-dark); color: #fff; position: fixed; top: 0; left: 0; bottom: 0; padding: 24px 18px; box-shadow: 4px 0 24px rgba(0,0,0,.15); }
+  .sidebar-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; margin-bottom: 24px; }
+  .sidebar-logo-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--brand-gold); display: flex; align-items: center; justify-content: center; color: #7B1C1C; font-size: 18px; font-weight: 800; }
+  .sidebar-logo-text { font-family: var(--font-head); font-size: 18px; font-weight: 700; color: #fff; line-height: 1.1; }
+  .sidebar-logo-text span { display: block; font-size: 11px; font-weight: 400; color: rgba(255,255,255,.7); margin-top: 2px; }
+  .sidebar-user { display: flex; gap: 14px; align-items: center; padding: 16px 14px; background: rgba(255,255,255,.08); border-radius: 16px; margin-bottom: 26px; }
+  .sidebar-user-avatar { width: 46px; height: 46px; border-radius: 50%; background: var(--brand-gold); display: flex; align-items: center; justify-content: center; color: #7B1C1C; font-size: 16px; font-weight: 700; }
+  .sidebar-user-info h3 { margin: 0; font-size: 14px; font-weight: 700; }
+  .sidebar-user-info p { margin: 4px 0 0; font-size: 12px; color: rgba(255,255,255,.75); }
+  .sidebar-nav { display: grid; gap: 8px; }
+  .sidebar-nav a { display: flex; align-items: center; justify-content: space-between; padding: 14px 14px; border-radius: 14px; text-decoration: none; color: rgba(255,255,255,.8); font-size: 13.5px; font-weight: 500; transition: background .2s, color .2s; }
+  .sidebar-nav a:hover, .sidebar-nav a.active { background: rgba(255,255,255,.14); color: #fff; }
+  .sidebar-nav a i { font-size: 14px; }
+  .logout-btn { margin-top: auto; display: inline-flex; align-items: center; gap: 10px; justify-content: center; padding: 12px 14px; border-radius: 14px; background: #ef4444; color: #fff; text-decoration: none; font-weight: 700; }
+  .dash-main { margin-left: var(--sidebar-w); flex: 1; padding: 30px 32px; }
+  .topbar { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; }
+  .topbar h1 { margin: 0; font-family: var(--font-head); font-size: 32px; color: #1f1f1f; }
+  .topbar p { margin: 0; color: #565656; font-size: 14px; }
+  .metric-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-bottom: 24px; }
+  .metric-card { background: #fff; border-radius: var(--card-radius); padding: 22px; box-shadow: 0 10px 24px rgba(0,0,0,.06); }
+  .metric-card .label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
+  .metric-card .value { font-size: 34px; margin: 0; color: #1f1f1f; font-weight: 700; }
+  .metric-card .note { margin-top: 10px; font-size: 12px; color: #777; }
+  .section-card { background: #fff; border-radius: var(--card-radius); box-shadow: 0 10px 24px rgba(0,0,0,.06); overflow: hidden; margin-bottom: 24px; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid #f2f2f2; }
+  .section-header h2 { margin: 0; font-size: 16px; font-family: var(--font-head); color: #1f1f1f; }
+  .section-header a { font-size: 13px; color: var(--brand-dark); text-decoration: none; font-weight: 600; }
+  .section-body { padding: 20px 24px; }
+  .status-pill { padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+  .pill-active { background: #dcfce7; color: #166534; }
+  .pill-pending { background: #fef3c7; color: #92400E; }
+  .pill-rejected { background: #fee2e2; color: #991b1b; }
+  .table-wrap { overflow-x: auto; }
+  .data-table { width: 100%; border-collapse: collapse; min-width: 720px; }
+  .data-table th, .data-table td { padding: 14px 16px; text-align: left; font-size: 13px; color: #333; border-bottom: 1px solid #f2f2f2; }
+  .data-table thead { background: #faf5ef; color: #1f1f1f; }
+  .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 18px; border-radius: 12px; background: var(--brand-gold); color: #7B1C1C; font-weight: 700; text-decoration: none; border: none; cursor: pointer; }
+  .btn-secondary { padding: 10px 16px; border-radius: 12px; border: 1px solid #ddd; background: #fff; color: #4b5563; text-decoration: none; font-weight: 600; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+  .summary-card { background: #fff; border-radius: var(--card-radius); padding: 22px; box-shadow: 0 10px 24px rgba(0,0,0,.06); }
+  .summary-card h3 { margin: 0; font-size: 13px; font-family: var(--font-head); text-transform: uppercase; letter-spacing: .08em; color: #92400E; }
+  .summary-card p { margin: 14px 0 0; font-size: 28px; font-weight: 700; color: #1f1f1f; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 20px; }
+  .form-group { display: grid; gap: 8px; margin-bottom: 18px; }
+  .form-group label { font-size: 13px; font-weight: 700; color: #333; }
+  .form-group input, .form-group select { width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 12px; font-size: 14px; }
+  .form-group textarea { width: 100%; min-height: 120px; padding: 12px 14px; border: 1px solid #ddd; border-radius: 12px; font-size: 14px; resize: vertical; }
+  .chart-placeholder { min-height: 240px; border-radius: 18px; background: linear-gradient(135deg, rgba(255,255,255,.9), rgba(243,234,213,.8)); display: grid; place-items: center; color: #7B1C1C; font-weight: 700; }
+  @media (max-width: 1024px) { .metric-grid, .grid-2 { grid-template-columns: 1fr; } }
+  @media (max-width: 860px) { .dash-sidebar { position: relative; width: 100%; min-width: 100%; } .dash-main { margin-left: 0; padding: 20px; } }
+</style>
+
+<div class="dash-shell">
+  <aside class="dash-sidebar">
+    <a href="{% url 'admin_dashboard' %}" class="sidebar-logo">
+      <div class="sidebar-logo-icon">GC</div>
+      <div class="sidebar-logo-text">GoCartz <span>Admin Portal</span></div>
+    </a>
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar">{{ request.user.username|slice:":2"|upper }}</div>
+      <div class="sidebar-user-info">
+        <h3>{{ request.user.username }}</h3>
+        <p>Super Admin</p>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <a href="{% url 'admin_dashboard' %}" class="{% if admin_active == 'dashboard' %}active{% endif %}">Dashboard <i class="fa fa-tachometer-alt"></i></a>
+      <a href="{% url 'admin_vendor_approvals' %}" class="{% if admin_active == 'vendor_approvals' %}active{% endif %}">Vendor Approvals <i class="fa fa-user-check"></i></a>
+      <a href="{% url 'admin_categories' %}" class="{% if admin_active == 'categories' %}active{% endif %}">Categories <i class="fa fa-tags"></i></a>
+      <a href="{% url 'admin_all_orders' %}" class="{% if admin_active == 'all_orders' %}active{% endif %}">All Orders <i class="fa fa-box"></i></a>
+      <a href="{% url 'admin_commission_settings' %}" class="{% if admin_active == 'commission' %}active{% endif %}">Commission Settings <i class="fa fa-percent"></i></a>
+      <a href="{% url 'admin_refund_requests' %}" class="{% if admin_active == 'refunds' %}active{% endif %}">Refund Requests <i class="fa fa-undo"></i></a>
+      <a href="{% url 'admin_analytics' %}" class="{% if admin_active == 'analytics' %}active{% endif %}">Analytics <i class="fa fa-chart-line"></i></a>
+    </div>
+    <a href="{% url 'logout' %}" class="logout-btn"><i class="fa fa-power-off"></i> Logout</a>
+  </aside>
+
+  <main class="dash-main">
+    {% include 'shop/inc/message.html' %}
+    {% block admin_content %}{% endblock %}
+  </main>
+</div>
+{% endblock content %}

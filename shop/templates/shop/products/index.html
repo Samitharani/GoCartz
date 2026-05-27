@@ -6,6 +6,32 @@
     <h3>All Products</h3>
     <hr>
 
+    <form method="get" class="row g-3 align-items-end mb-4">
+        <div class="col-md-3">
+            <label class="form-label">Min price</label>
+            <input type="number" step="0.01" name="min_price" class="form-control" value="{{ selected_min_price }}" placeholder="Min">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Max price</label>
+            <input type="number" step="0.01" name="max_price" class="form-control" value="{{ selected_max_price }}" placeholder="Max">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Vendor location</label>
+            <select name="vendor_city" class="form-select">
+                <option value="">All locations</option>
+                {% for location in vendor_locations %}
+                    <option value="{{ location }}" {% if selected_vendor_city == location %}selected{% endif %}>{{ location }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            {% if category_name %}
+            <a href="{% url 'collections' category_name %}" class="btn btn-secondary ms-2">Reset</a>
+            {% endif %}
+        </div>
+    </form>
+
     <div class="row">
         {% for product in products %}
         <div class="col-md-3 col-sm-6 mb-4">
@@ -19,6 +45,9 @@
                 <a href="{% url 'product_details' product.category.name product.name %}">
                     <div class="card-body">
                         <h5 class="card-title text-primary">{{ product.name }}</h5>
+                        <p class="mb-1 text-muted" style="font-size:0.9rem;">
+                            Rating: {{ product.average_rating }} / 5 ({{ product.review_count }} reviews)
+                        </p>
                         <p>
                             <span class="float-start old_price">
                                 <s>Rs.{{ product.original_price }}</s>
